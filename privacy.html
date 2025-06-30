@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth antialiased" x-data="themeToggle()" x-init="initTheme()" :class="{ dark: isDark }">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Privacy Policy • CreonAI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <style>
+    html.dark body { background-color: #0f172a; color: #cbd5e1; }
+    html:not(.dark) body { background-color: #ffffff; color: #1e293b; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans">
+
+  <!-- HEADER -->
+  <header class="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+      <a href="/" class="text-2xl font-bold text-indigo-600 dark:text-cyan-400">CreonAI</a>
+      <button @click="toggleTheme()" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition">
+        <template x-if="isDark">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.293 13.293a8 8 0 11-10.586-10.586A8 8 0 0017.293 13.293z"/>
+          </svg>
+        </template>
+        <template x-if="!isDark">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1M4.22 4.22l.7.7M18.36 18.36l.7.7M1 12H3m18 0h2m-2.36-6.36l-.7.7M6.34 17.66l-.7.7"/>
+          </svg>
+        </template>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 px-6 py-12 max-w-5xl mx-auto space-y-8">
+    <h1 class="text-4xl font-extrabold mb-6">Privacy Policy</h1>
+    <p>Last updated: <strong>June 2025</strong></p>
+
+    <section class="space-y-4">
+      <h2 class="text-2xl font-bold">1. Introduction</h2>
+      <p>Welcome to CreonAI. This Privacy Policy explains how we collect, use, disclose, and protect your information when you visit or use our website, mobile app, and AI-powered tools (“Services”).</p>
+      <p>By using CreonAI, you agree to the terms of this Privacy Policy. If you do not agree, please do not use our Services.</p>
+    </section>
+
+    <section class="space-y-4">
+      <h2 class="text-2xl font-bold">2. Information We Collect</h2>
+      <ul class="list-disc pl-6">
+        <li><strong>Account Info:</strong> Username, email address, and profile picture.</li>
+        <li><strong>Usage Data:</strong> Logs, chat history, image/video generations, and clicks.</li>
+        <li><strong>Device Info:</strong> IP address, browser type, OS, device type.</li>
+        <li><strong>Payment Data:</strong> Provided via Stripe or third-party processors. We never store full credit card numbers.</li>
+        <li><strong>Third-Party Auth:</strong> Google, Facebook, Apple login info (OAuth only).</li>
+        <li><strong>Cookies & Tracking:</strong> We use cookies and pixels for analytics and personalization.</li>
+        <li><strong>AI Input Data:</strong> Any text, files, or prompts you submit to our AI tools.</li>
+      </ul>
+    </section>
+
+    <section class="space-y-4">
+      <h2 class="text-2xl font-bold">3. How We Use Your Information</h2>
+      <ul class="list-disc pl-6">
+        <li>To provide and improve our AI services.</li>
+        <li>To personalize your experience.</li>
+        <li>To respond to your support requests.</li>
+        <li>To send product updates and marketing (only with your consent).</li>
+        <li>To prevent abuse, fraud, or illegal activities.</li>
+        <li>For internal analytics and usage optimization.</li>
+      </ul>
+    </section>
+
+    <section class="space-y-4">
+      <h2 class="text-2xl font-bold">4. How We Share Information</h2>
+      <p>We do not sell your data. We may share it with:</p>
+      <ul class="list-disc pl-6">
+        <li>Trusted vendors (e.g. Stripe, OpenAI, Google).</li>
+        <li>Analytics providers (e.g. Plausible, Vercel Analytics).</li>
+        <li>Legal authorities when required by law.</li>
+        <li>Business transfers (e.g. if CreonAI is acquired).</li>
+      </ul>
+    </section>
+
+    <section class="space-y-4">
+      <h2 class="text-2xl font-bold">5. AI Content and Input Policy</h2>
+      <ul class="list-disc pl-6">
+        <li>Your prompts and generated content may be used for debugging, moderation, or to improve our models — unless you opt out.</li>
+        <li>We may store anonymized metadata (e.g. model name, generation type).</li>
+        <li>Never enter confidential or sensitive personal data into AI tools.</li>
+      </ul>
+    </section>
+
+    <section class="space-y-4">
+      <h2 class="text-2xl font-bold">6. Cookies & Analytics</h2>
+      <p>We use cookies and similar technologies to track usage and improve performance. These include:</p>
+      <ul class="list-disc pl-6">
+        <li>Session cookies (login state, preferences)</li>
+        <li>Analytics cookies (traffic, behavior)</li>
+        <li>Marketing cookies (optional, opt-in only)</li>
+      </ul>
+      <p>You may control cookie behavior through your browser settings or our <a href="/cookie-settings" class="text-indigo-600">Cookie Settings</a> page.</p>
+    </section>
+
+    <section class="space-y-4">
+      <h2 class="text-2xl font-bold">7. Data Retention</h2>
+      <p>We retain your data as long as your account is active or as needed to provide services. You may request deletion at any time.</p>
+    </section>
+
+    <section class="space-y-4">
+      <h2 class="text-2xl font-bold">8. Your Rights</h2>
+      <ul class="list-disc pl-6">
+        <li>Access your data</li>
+        <li>Request correction or deletion</li>
+        <li>Export your data (JSON)</li>
+        <li>Withdraw consent for processing</li>
+      </ul>
+      <p>To exercise these rights, email us at <a href="mailto:privacy@creonai.com" class="text-indigo-600">privacy@creonai.com</a>.</p>
+    </section>
+
+    <section class="space-y-4">
+      <h2 class="text-2xl font-bold">9. International Compliance</h2>
+      <ul class="list-disc pl-6">
+        <li><strong>GDPR:</strong> We comply with EU/EEA data laws. You may lodge a complaint with your DPA.</li>
+        <li><strong>CCPA:</strong> California users may opt-out of “sale” of data (we don’t sell anyway).</li>
+        <li><strong>Australia:</strong> We adhere to APP privacy principles.</li>
+        <li><strong>UK DPA 2018:</strong> Applies to all UK users.</li>
+      </ul>
+    </section>
+
+    <section class="space-y-4">
+      <h2 class="text-2xl font-bold">10. Security</h2>
+      <p>We implement modern security best practices, including:</p>
+      <ul class="list-disc pl-6">
+        <li>SSL encryption</li>
+        <li>Token-based authentication</li>
+        <li>Access control and audit logs</li>
+        <li>Cloud-based security hardening</li>
+      </ul>
+    </section>
+
+    <section class="space-y-4">
+      <h2 class="text-2xl font-bold">11. Children’s Privacy</h2>
+      <p>CreonAI is not intended for children under 13 (or equivalent age in your jurisdiction). We do not knowingly collect data from minors.</p>
+    </section>
+
+    <section class="space-y-4">
+      <h2 class="text-2xl font-bold">12. Changes to This Policy</h2>
+      <p>We may update this policy from time to time. You’ll be notified of significant changes via email or in-app alert.</p>
+    </section>
+
+    <section class="space-y-4">
+      <h2 class="text-2xl font-bold">13. Contact</h2>
+      <p>Have questions or concerns? Email us anytime at <a href="mailto:privacy@creonai.com" class="text-indigo-600">privacy@creonai.com</a>.</p>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="text-center text-xs text-gray-500 dark:text-gray-400 py-6 border-t border-gray-200 dark:border-gray-700">
+    &copy; <span x-text="new Date().getFullYear()"></span> CreonAI. All rights reserved.
+  </footer>
+
+  <!-- Theme Toggle Script -->
+  <script>
+    function themeToggle() {
+      return {
+        isDark: false,
+        initTheme() {
+          this.isDark = localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.classList.toggle('dark', this.isDark);
+        },
+        toggleTheme() {
+          this.isDark = !this.isDark;
+          document.documentElement.classList.toggle('dark', this.isDark);
+          localStorage.theme = this.isDark ? 'dark' : 'light';
+        }
+      }
+    }
+  </script>
+</body>
+</html>

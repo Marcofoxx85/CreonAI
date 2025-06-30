@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ dark: localStorage.theme === 'dark' }"
+      x-init="$watch('dark', val => localStorage.theme = val ? 'dark' : 'light')"
+      :class="{ 'dark': dark }">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>CreonAI — Let Ideas Mutate Into Art</title>
+  <meta name="description"
+        content="CreonAI is your cinematic, cyber-futurist playground for generative text, video, voice, and imagery." />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <meta property="og:title" content="CreonAI — Futuristic AI Creation Suite" />
+  <meta property="og:description"
+        content="Spin up viral shorts, glitchy visuals, and voice clones in seconds. Your chaos. Super-powered." />
+  <meta property="og:image" content="/og-cover.png" />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Tailwind JIT CDN (swap to local build in production) -->
+  <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+
+  <!-- Alpine.js for lightweight reactivity -->
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <!-- Custom styles -->
+  <style>
+    /* Star-field background */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 30%, rgba(79,70,229,.15), transparent 70%),
+                  #050618;
+      z-index: -2;
+    }
+    canvas#starfield {
+      position: fixed; inset: 0; z-index: -1;
+    }
+    /* Glitch text effect */
+    .glitch {
+      position: relative;
+      color: #fff;
+      font-weight: 700;
+    }
+    .glitch::before, .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%; height: 100%;
+      clip-path: inset(0 0 0 0);
+      background: inherit;
+    }
+    .glitch::before {
+      left: 2px; text-shadow: -2px 0 #7C3AED;
+      animation: glitch 2s infinite;
+    }
+    .glitch::after  {
+      left: -2px; text-shadow: -2px 0 #67E8F9;
+      animation: glitch 2s infinite reverse;
+    }
+    @keyframes glitch {
+      0%{ clip-path: inset(0 0 95% 0); }
+      10%{ clip-path: inset(15% 0 70% 0); }
+      20%{ clip-path: inset(30% 0 45% 0); }
+      30%{ clip-path: inset(60% 0 20% 0); }
+      40%{ clip-path: inset(80% 0 0 0); }
+      50%{ clip-path: inset(0 0 95% 0); }
+      60%{ clip-path: inset(0 0 70% 0); }
+      70%{ clip-path: inset(0 0 45% 0); }
+      80%{ clip-path: inset(0 0 20% 0); }
+      90%{ clip-path: inset(0 0 0 0); }
+      100%{ clip-path: inset(0 0 95% 0); }
+    }
+    /* Scroll-bar subtle styling */
+    ::-webkit-scrollbar { width:8px; }
+    ::-webkit-scrollbar-track { background:#0a0d25; }
+    ::-webkit-scrollbar-thumb { background:#4f46e5;border-radius:4px; }
+  </style>
+</head>
+
+<body class="font-sans antialiased text-gray-300 dark:text-slate-300
+             selection:bg-violet-600/80 selection:text-white">
+
+  <!-- Night/Day toggle -->
+  <button x-on:click="dark = !dark"
+          class="fixed top-4 right-4 z-40 p-2 rounded-full
+                 backdrop-blur-md bg-white/10 hover:bg-white/20
+                 text-lg focus:outline-none focus:ring-2 focus:ring-violet-500">
+      <span x-show="!dark">🌙</span>
+      <span x-show="dark">🔆</span>
+  </button>
+
+  <!-- Animated canvas background -->
+  <canvas id="starfield"></canvas>
+  <script>
+    /* Minimal starfield */
+    const c = document.getElementById('starfield');
+    const ctx = c.getContext('2d'), stars = 120;
+    let w, h;
+    function resize(){
+      w = c.width  = window.innerWidth;
+      h = c.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize); resize();
+    const pts = Array.from({length: stars}, () => ({
+      x: Math.random()*w,
+      y: Math.random()*h,
+      vx:(Math.random()-0.5)*0.3,
+      vy:(Math.random()-0.5)*0.3
+    }));
+    function draw(){
+      ctx.clearRect(0,0,w,h);
+      ctx.fillStyle='#a855f7';
+      pts.forEach(p=>{
+        p.x = (p.x + p.vx + w) % w;
+        p.y = (p.y + p.vy + h) % h;
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,1.2,0,Math.PI*2); ctx.fill();
+      });
+      requestAnimationFrame(draw);
+    } draw();
+  </script>
+
+  <!-- NAVBAR -->
+  <header class="relative z-20">
+    <div class="mx-auto max-w-7xl px-6 lg:px-8">
+      <nav class="flex h-16 items-center justify-between lg:justify-start">
+        <a href="/" class="flex items-center gap-2">
+          <img src="/logo.svg" alt="CreonAI" class="h-7 w-7" />
+          <span class="text-xl font-bold tracking-wider text-white">CreonAI</span>
+        </a>
+        <!-- Desktop links -->
+        <ul class="hidden lg:flex ml-12 gap-8 text-sm">
+          <li><a href="#features" class="hover:text-white/80">Features</a></li>
+          <li><a href="#studio" class="hover:text-white/80">Studios</a></li>
+          <li><a href="#pricing" class="hover:text-white/80">Pricing</a></li>
+          <li><a href="#community" class="hover:text-white/80">Community</a></li>
+        </ul>
+        <div class="ml-auto flex items-center gap-4">
+          <a href="/login"
+             class="hidden lg:block text-sm font-medium hover:text-white/80">Login</a>
+          <a href="/register"
+             class="inline-block rounded-full bg-violet-600 hover:bg-violet-700
+                    px-4 py-2 text-sm font-semibold text-white shadow-sm">
+              Get Started
+          </a>
+          <!-- Mobile menu button -->
+          <button x-on:click="$dispatch('open-mobile')"
+                  class="lg:hidden p-2.5 rounded-md hover:bg-white/10 focus:outline-none">
+            ☰
+          </button>
+        </div>
+      </nav>
+    </div>
+
+    <!-- MOBILE DRAWER -->
+    <div
+      x-data="{ open:false }"
+      @open-mobile.window="open=true"
+      x-show="open" x-transition.opacity.duration.300ms
+      class="lg:hidden fixed inset-0 z-30 bg-black/70 backdrop-blur-sm flex">
+      <aside x-show="open" x-transition.origin.left
+             class="w-72 bg-[#0f1129] p-6 overflow-y-auto">
+        <button @click="open=false" class="mb-6 text-left">✕</button>
+        <ul class="space-y-4 text-lg">
+          <li><a href="#features" @click="open=false">Features</a></li>
+          <li><a href="#studio" @click="open=false">Studios</a></li>
+          <li><a href="#pricing" @click="open=false">Pricing</a></li>
+          <li><a href="#community" @click="open=false">Community</a></li>
+          <li class="pt-4 border-t border-white/10">
+            <a href="/login">Login</a>
+          </li>
+          <li>
+            <a href="/register"
+               class="block rounded-full bg-violet-600 px-4 py-2 text-center">Get Started</a>
+          </li>
+        </ul>
+      </aside>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="relative isolate pt-32 pb-24 sm:pb-40">
+    <div class="mx-auto max-w-4xl px-6 text-center">
+      <h1 class="glitch text-5xl sm:text-6xl md:text-7xl"
+          data-text="Create at the Speed of Thought">
+          Create at the Speed of Thought
+      </h1>
+      <p class="mt-6 max-w-3xl mx-auto text-lg text-slate-300">
+        Generative video, voice, text&nbsp;and imagery in one chaotic-good canvas.
+        Built for creators who want <span class="text-violet-400/90">virality</span> on tap.
+      </p>
+      <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/register"
+           class="rounded-full bg-violet-600 hover:bg-violet-700 px-8 py-3
+                  text-base font-semibold text-white shadow-md shadow-violet-500/30">
+            Start For Free
+        </a>
+        <a href="#video-demo"
+           class="rounded-full bg-white/10 hover:bg-white/20 px-8 py-3
+                  text-base font-semibold text-white backdrop-blur-sm">
+            Watch 45-sec Demo ↗
+        </a>
+      </div>
+    </div>
+
+    <!-- Subtle floating shapes -->
+    <svg class="absolute left-0 top-1/3 -z-10 blur-3xl opacity-50"
+         width="450" height="450" viewBox="0 0 450 450" fill="none">
+      <circle cx="225" cy="225" r="225" fill="url(#grad1)"/>
+      <defs>
+        <radialGradient id="grad1">
+          <stop offset="0%" stop-color="#9333ea"/>
+          <stop offset="100%" stop-color="#4c1d95" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+    </svg>
+  </section>
+  <!-- PRICING -->
+  <section id="pricing" class="relative py-28 sm:py-36 bg-[#080a1e]">
+    <div class="mx-auto max-w-6xl px-6">
+      <h2 class="text-center text-3xl md:text-4xl font-extrabold text-white">
+        Plans for <span class="text-violet-400">Solo Hustlers</span> &amp; <span class="text-violet-400">Studio Teams</span>
+      </h2>
+
+      <!-- Toggle -->
+      <div
+        x-data="{ annual:true }"
+        class="mt-12 flex items-center justify-center gap-4 text-sm">
+        <span :class="!annual && 'text-violet-400'">Monthly</span>
+        <label class="inline-flex cursor-pointer items-center">
+          <input type="checkbox" x-model="annual" class="sr-only">
+          <span
+            class="relative h-6 w-11 rounded-full bg-white/20 ring-1 ring-white/10
+                   transition-colors duration-300
+                   after:absolute after:top-0.5 after:left-0.5 after:h-5 after:w-5
+                   after:rounded-full after:bg-white after:transition-transform"
+            :class="annual ? 'bg-violet-500 after:translate-x-5' : 'bg-white/20'">
+          </span>
+        </label>
+        <span :class="annual && 'text-violet-400'">Annual <span class="opacity-70">(save 20%)</span></span>
+      </div>
+
+      <!-- Cards -->
+      <div class="mt-16 grid gap-8 lg:grid-cols-3">
+        <!-- FREE -->
+        <article
+          class="flex flex-col rounded-3xl bg-white/5 p-8 backdrop-blur-md
+                 ring-1 ring-inset ring-white/10">
+          <h3 class="text-lg font-semibold text-white">Explorer</h3>
+          <p class="mt-2 text-slate-300">For dabbling &amp; discovering.</p>
+          <p class="mt-6 flex items-baseline text-white">
+            <span class="text-4xl font-bold">Free</span>
+            <span class="ml-1 text-sm text-slate-300">/ forever</span>
+          </p>
+          <ul class="mt-8 space-y-3 text-sm leading-6">
+            <li>✔ 5 000 credits</li>
+            <li>✔ Basic TTS &amp; image gen</li>
+            <li>✖ Team sharing</li>
+          </ul>
+          <a href="/register"
+             class="mt-auto w-full rounded-full bg-violet-600 px-6 py-3 text-center
+                    font-semibold text-white shadow-sm hover:bg-violet-700">
+            Get Started
+          </a>
+        </article>
+
+        <!-- CREATOR -->
+        <article
+          class="relative flex flex-col rounded-3xl bg-violet-600/80 p-8
+                 shadow-lg ring-2 ring-violet-500 backdrop-blur">
+          <div
+            class="absolute -top-3 right-6 rounded-full bg-amber-400/90 px-3 py-1
+                   text-xs font-semibold text-black shadow-md">Most popular</div>
+          <h3 class="text-lg font-semibold text-white">Creator</h3>
+          <p class="mt-2 text-violet-100">Everything you need to scale content.</p>
+          <p class="mt-6 flex items-baseline text-white">
+            <span class="text-4xl font-bold"
+                  x-text="annual ? '£19' : '£24'"></span>
+            <span class="ml-1 text-sm"
+                  x-text="annual ? '/ mo billed yearly' : '/ mo'"></span>
+          </p>
+          <ul class="mt-8 space-y-3 text-sm leading-6">
+            <li>✔ 100 000 credits / mo</li>
+            <li>✔ Unlimited voice clones</li>
+            <li>✔ HD Veo video renders</li>
+            <li>✔ 5 team seats</li>
+          </ul>
+          <a href="/subscribe.html"
+             class="mt-auto w-full rounded-full bg-white/90 px-6 py-3 text-center
+                    font-semibold text-violet-700 shadow-lg hover:bg-white">
+            Upgrade
+          </a>
+        </article>
+
+        <!-- STUDIO -->
+        <article
+          class="flex flex-col rounded-3xl bg-white/5 p-8 backdrop-blur-md
+                 ring-1 ring-inset ring-white/10">
+          <h3 class="text-lg font-semibold text-white">Studio</h3>
+          <p class="mt-2 text-slate-300">For agencies &amp; production houses.</p>
+          <p class="mt-6 flex items-baseline text-white">
+            <span class="text-4xl font-bold"
+                  x-text="annual ? '£49' : '£59'"></span>
+            <span class="ml-1 text-sm"
+                  x-text="annual ? '/ mo billed yearly' : '/ mo'"></span>
+          </p>
+          <ul class="mt-8 space-y-3 text-sm leading-6">
+            <li>✔ 500 000 credits / mo</li>
+            <li>✔ Fine-tune private models</li>
+            <li>✔ Priority GPU queue</li>
+            <li>✔ Unlimited seats</li>
+          </ul>
+          <a href="/subscribe.html"
+             class="mt-auto w-full rounded-full bg-violet-600 px-6 py-3 text-center
+                    font-semibold text-white shadow-sm hover:bg-violet-700">
+            Book Demo
+          </a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMUNITY / SOCIAL PROOF -->
+  <section id="community" class="relative py-24 sm:py-32">
+    <div class="mx-auto max-w-6xl px-6 text-center">
+      <h2 class="text-3xl md:text-4xl font-extrabold text-white">
+        Trusted by <span class="text-violet-400">3 700+</span> Creators
+      </h2>
+      <p class="mt-4 text-lg text-slate-300">
+        From indie TikTok jokers to 7-figure media brands.
+      </p>
+    </div>
+
+    <!-- Testimonials -->
+    <div
+      class="mx-auto mt-16 grid max-w-4xl gap-8 sm:grid-cols-2 lg:grid-cols-3"
+      x-data
+      x-intersect.once="$el.querySelectorAll('blockquote').forEach((b,i)=>
+        setTimeout(()=>b.classList.remove('opacity-0','translate-y-4'),i*120))">
+      <blockquote
+        class="opacity-0 translate-y-4 transition rounded-xl bg-white/5 p-6
+               backdrop-blur-md ring-1 ring-white/10">
+        <p class="text-sm leading-relaxed text-slate-300">
+          “CreonAI chopped our idea-to-publish time by 80%. Our shorts pop
+          off daily now.”
+        </p>
+        <footer class="mt-4 flex items-center gap-3">
+          <img src="/avatars/lea.png" alt="" class="h-8 w-8 rounded-full">
+          <div>
+            <span class="text-sm text-white font-medium">Lea Blue</span>
+            <span class="block text-xs text-slate-400">@techqueenz</span>
+          </div>
+        </footer>
+      </blockquote>
+
+      <blockquote
+        class="opacity-0 translate-y-4 transition rounded-xl bg-white/5 p-6
+               backdrop-blur-md ring-1 ring-white/10">
+        <p class="text-sm leading-relaxed text-slate-300">
+          “We replaced three freelancers with one Creator plan. The ROI is silly.”
+        </p>
+        <footer class="mt-4 flex items-center gap-3">
+          <img src="/avatars/raj.png" alt="" class="h-8 w-8 rounded-full">
+          <div>
+            <span class="text-sm text-white font-medium">Raj Patel</span>
+            <span class="block text-xs text-slate-400">Founder, OwlHype</span>
+          </div>
+        </footer>
+      </blockquote>
+
+      <blockquote
+        class="opacity-0 translate-y-4 transition rounded-xl bg-white/5 p-6
+               backdrop-blur-md ring-1 ring-white/10">
+        <p class="text-sm leading-relaxed text-slate-300">
+          “The Audio Lab nails voiceovers that sound better than me on coffee #6.”
+        </p>
+        <footer class="mt-4 flex items-center gap-3">
+          <img src="/avatars/kelly.png" alt="" class="h-8 w-8 rounded-full">
+          <div>
+            <span class="text-sm text-white font-medium">Kelly Huang</span>
+            <span class="block text-xs text-slate-400">Podcast Host</span>
+          </div>
+        </footer>
+      </blockquote>
+    </div>
+  </section>
+
+  <!-- NEWSLETTER -->
+  <section class="relative py-24 sm:py-32 bg-[#07091c]">
+    <div class="mx-auto max-w-xl px-6 text-center">
+      <h2 class="text-3xl font-extrabold text-white">
+        Weekly Digest, Zero Spam
+      </h2>
+      <p class="mt-4 text-lg text-slate-300">
+        One weird AI trick in your inbox every Thursday. Unsubscribe anytime.
+      </p>
+      <form
+        action="https://creonai-mock.mailer.dev/subscribe"
+        method="POST"
+        class="mx-auto mt-8 flex flex-col gap-4 sm:flex-row sm:gap-0 sm:overflow-hidden
+               rounded-full bg-white/10 p-2 backdrop-blur">
+        <input required type="email" name="email"
+               placeholder="you@galaxy.studio"
+               class="flex-1 bg-transparent px-6 py-3 text-white
+                      placeholder-slate-400 focus:outline-none">
+        <button
+          type="submit"
+          class="rounded-full bg-violet-600 px-6 py-3 text-sm font-semibold
+                 text-white hover:bg-violet-700">Subscribe</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="relative border-t border-white/10 bg-[#050618] py-16">
+    <div class="mx-auto max-w-6xl px-6">
+      <div class="grid gap-12 lg:grid-cols-5">
+        <div class="lg:col-span-2">
+          <a href="/" class="flex items-center gap-2">
+            <img src="/logo.svg" alt="" class="h-7 w-7">
+            <span class="text-xl font-bold tracking-wider text-white">CreonAI</span>
+          </a>
+          <p class="mt-4 max-w-sm text-sm text-slate-400">
+            A cinematic, cyber-futurist playground for creators who joke,
+            glitch and grow audiences at lightspeed.
+          </p>
+        </div>
+
+        <div>
+          <h4 class="text-sm font-semibold text-white">Platform</h4>
+          <ul class="mt-4 space-y-2 text-sm text-slate-400">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#studio">Studios</a></li>
+            <li><a href="#pricing">Pricing</a></li>
+            <li><a href="/library.html">Template Library</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-sm font-semibold text-white">Company</h4>
+          <ul class="mt-4 space-y-2 text-sm text-slate-400">
+            <li><a href="/whyus.html">Why Us</a></li>
+            <li><a href="/credits.html">Credits</a></li>
+            <li><a href="/privacy.html">Privacy</a></li>
+            <li><a href="/terms.html">Terms</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="text-sm font-semibold text-white">Connect</h4>
+          <ul class="mt-4 space-y-2 text-sm text-slate-400">
+            <li><a href="https://twitter.com/creonai">Twitter / X</a></li>
+            <li><a href="https://tiktok.com/@creonai">TikTok</a></li>
+            <li><a href="mailto:hello@creonai.co.uk">Email us</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <p class="mt-12 text-center text-xs text-slate-500">
+        © <span x-text="new Date().getFullYear()"></span> CreonAI Ltd. All rights reserved.
+      </p>
+    </div>
+  </footer>
+
+  <!-- END BODY -->
+</body>
+</html>

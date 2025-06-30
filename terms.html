@@ -1,0 +1,484 @@
+<!-- terms.html | chunk 1/10 | lines 1–100 -->
+<!DOCTYPE html>
+<html lang="en" x-data="themeToggle()" x-init="initTheme()" :class="{ dark: isDark }">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Terms of Service • CreonAI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <style>
+    html.dark body { background-color: #0f172a; color: #cbd5e1; }
+    html:not(.dark) body { background-color: #f8fafc; color: #0f172a; }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+  <!-- ✦ NAVIGATION BAR ✦ -->
+  <header class="bg-white/90 dark:bg-slate-900/90 backdrop-blur border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2 text-xl font-bold">
+        <img src="/static/logo.png" alt="Logo" class="h-8 w-8" />
+        <span>Creon<span class="text-indigo-600 dark:text-cyan-400">AI</span></span>
+      </a>
+      <nav class="hidden md:flex gap-6 text-sm font-medium">
+        <a href="/" class="hover:text-indigo-600">Home</a>
+        <a href="/chat" class="hover:text-indigo-600">Chat</a>
+        <a href="/register" class="hover:text-indigo-600">Register</a>
+        <a href="/profile" class="hover:text-indigo-600">Profile</a>
+        <a href="/privacy" class="hover:text-indigo-600">Privacy</a>
+        <a href="/terms" class="text-indigo-600 font-semibold underline">Terms</a>
+      </nav>
+      <button @click="toggleTheme()" class="p-2 ml-4 hover:bg-gray-100 dark:hover:bg-gray-800 rounded">
+        <svg x-show="!isDark" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 3v1m0 16v1M4.22 4.22l.7.7M18.36 18.36l.7.7M1 12H3m18 0h2m-2.36-6.36l-.7.7M6.34 17.66l-.7.7" />
+        </svg>
+        <svg x-show="isDark" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M17.293 13.293A8 8 0 1110.707 2.707a8.003 8.003 0 006.586 10.586z" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ✦ PAGE CONTENT ✦ -->
+  <main class="flex-1 px-4 py-10 max-w-4xl mx-auto">
+    <h1 class="text-3xl font-bold mb-6 text-center text-indigo-600 dark:text-indigo-400">Terms of Service</h1>
+    <p class="text-sm text-center text-gray-500 dark:text-gray-400 mb-10">Effective Date: June 23, 2025</p>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">1. Acceptance of Terms</h2>
+      <p class="text-sm leading-relaxed">
+        By accessing or using the CreonAI platform, including our website, services, tools, and applications, you agree to be bound by these Terms of Service ("Terms").
+        If you do not agree to these Terms, you must not use the Platform. These Terms constitute a binding agreement between you and CreonAI ("we", "us", "our").
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">2. Eligibility</h2>
+      <p class="text-sm leading-relaxed">
+        You must be at least 13 years old to use CreonAI. If you are under 18, you must have your parent or legal guardian’s permission to use the services.
+        By using the Platform, you represent and warrant that you meet all eligibility requirements and that your use of the Platform does not violate any applicable law.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">3. Changes to Terms</h2>
+      <p class="text-sm leading-relaxed">
+        We may update these Terms at any time in our sole discretion. We will provide notice of changes via email or on our Platform. Continued use after such updates
+        constitutes your acceptance of the modified Terms. We encourage you to review the Terms regularly.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">4. User Account</h2>
+      <ul class="list-disc ml-6 text-sm space-y-2">
+        <li>You must create an account to access certain features of the Platform.</li>
+        <li>You agree to provide accurate, current, and complete information during registration.</li>
+        <li>You are solely responsible for maintaining the confidentiality of your login credentials.</li>
+        <li>You are responsible for all activities that occur under your account, whether or not you authorized them.</li>
+        <li>You must notify us immediately if you suspect unauthorized use of your account.</li>
+      </ul>
+    </section>
+<!-- terms.html | chunk 2/10 | lines 101–200 -->
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">5. Platform Usage & License</h2>
+      <p class="text-sm leading-relaxed">
+        Subject to your compliance with these Terms, we grant you a limited, non-exclusive, non-transferable, revocable license to access and use the Platform
+        for personal or commercial purposes in accordance with any usage limitations described herein.
+      </p>
+      <p class="text-sm mt-2">
+        You agree not to:
+      </p>
+      <ul class="list-disc ml-6 text-sm space-y-2">
+        <li>Reverse-engineer, modify, or create derivative works of the Platform or its components.</li>
+        <li>Use scraping, crawling, or other automated means to extract data or content.</li>
+        <li>Exploit vulnerabilities or attempt unauthorized access to backend services.</li>
+        <li>Sub-license or resell any part of the Platform without written consent.</li>
+      </ul>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">6. User Conduct</h2>
+      <p class="text-sm leading-relaxed">
+        You agree to use the Platform only for lawful purposes. You will not upload, post, transmit, or otherwise make available any content that:
+      </p>
+      <ul class="list-disc ml-6 text-sm space-y-2">
+        <li>Is illegal, abusive, harassing, defamatory, or discriminatory.</li>
+        <li>Contains sexually explicit, violent, or hateful material.</li>
+        <li>Violates intellectual property or privacy rights of others.</li>
+        <li>Promotes self-harm, suicide, or dangerous behavior.</li>
+        <li>Uses AI output for deceptive or malicious purposes.</li>
+      </ul>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">7. AI Model Use & Responsibility</h2>
+      <p class="text-sm leading-relaxed">
+        CreonAI uses third-party AI models (e.g. OpenAI, Google Gemini, TTS, DALL·E, Veo) to generate content. By using our AI services, you acknowledge and agree that:
+      </p>
+      <ul class="list-disc ml-6 text-sm space-y-2">
+        <li>Generated content is machine-produced and may not be accurate, truthful, or appropriate.</li>
+        <li>CreonAI disclaims responsibility for actions taken based on AI outputs.</li>
+        <li>You are responsible for vetting AI-generated content before use or publication.</li>
+        <li>You must comply with all third-party model terms (e.g. OpenAI’s usage policy).</li>
+      </ul>
+      <p class="text-sm mt-2">
+        You agree not to prompt the system to generate content that violates any applicable law or our content guidelines.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">8. Subscription & Billing Terms</h2>
+      <p class="text-sm leading-relaxed">
+        Some features of the Platform require a paid subscription or credit-based model. By purchasing credits or subscribing, you agree to:
+      </p>
+      <ul class="list-disc ml-6 text-sm space-y-2">
+        <li>Pay all applicable fees as described on the Platform or in your plan.</li>
+        <li>Provide accurate billing information and update it as necessary.</li>
+        <li>Authorize us (or our processor) to charge your payment method on a recurring basis.</li>
+        <li>Understand that credit balances are non-refundable and non-transferable.</li>
+        <li>Acknowledge we may change pricing with advance notice.</li>
+      </ul>
+      <p class="text-sm mt-2">
+        You may cancel your subscription anytime. Cancellation will apply at the end of the current billing cycle unless otherwise stated.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">9. Content Ownership & Licensing</h2>
+      <p class="text-sm leading-relaxed">
+        You retain ownership of any original content you upload to the Platform. However, by submitting content (including prompts), you grant us a worldwide,
+        non-exclusive, royalty-free license to store, host, and use your content solely to provide services to you.
+      </p>
+      <p class="text-sm mt-2">
+        Generated AI content may be used for:
+      </p>
+      <ul class="list-disc ml-6 text-sm space-y-2">
+        <li>Serving results to you in real-time.</li>
+        <li>Improving the quality, speed, and performance of services.</li>
+        <li>Analytics and moderation (anonymized and limited).</li>
+      </ul>
+      <p class="text-sm mt-2">
+        You may use AI outputs for personal or commercial purposes, unless otherwise restricted by API terms (e.g. Gemini, OpenAI). You are responsible for ensuring proper use.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">10. Community Guidelines</h2>
+      <p class="text-sm leading-relaxed">
+        We may maintain public-facing features like shared chats, profiles, or leaderboards. You agree to follow our community standards, including:
+      </p>
+      <ul class="list-disc ml-6 text-sm space-y-2">
+        <li>Respecting other users.</li>
+        <li>Not posting harmful, spammy, or violent content.</li>
+        <li>Not impersonating any person or entity.</li>
+        <li>Abiding by moderation decisions.</li>
+      </ul>
+      <p class="text-sm mt-2">
+        We reserve the right to suspend or terminate your access for violations of these standards.
+      </p>
+    </section>
+<!-- terms.html | chunk 3/10 | lines 201–300 -->
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">11. Service Availability</h2>
+      <p class="text-sm leading-relaxed">
+        While we aim to provide reliable uptime and performance, we do not guarantee continuous availability of the Platform or its services.
+        Downtime may occur due to maintenance, upgrades, technical failures, third-party outages, or circumstances beyond our control.
+      </p>
+      <p class="text-sm mt-2">
+        You agree that CreonAI is not liable for any loss, damages, or inconvenience resulting from temporary interruptions in service.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">12. Technical Support</h2>
+      <p class="text-sm leading-relaxed">
+        Basic user support is provided via email, chat, or our help center. While we strive to respond promptly, we do not guarantee any specific response time.
+        Advanced or enterprise support may require a separate agreement or paid tier.
+      </p>
+      <p class="text-sm mt-2">
+        Support channels may be monitored for quality assurance or training purposes.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">13. Termination & Suspension</h2>
+      <p class="text-sm leading-relaxed">
+        We reserve the right to suspend, limit, or terminate your account at any time and for any reason, including but not limited to:
+      </p>
+      <ul class="list-disc ml-6 text-sm space-y-2">
+        <li>Violation of these Terms or other policies</li>
+        <li>Illegal activity or misuse of the Platform</li>
+        <li>Failure to pay for services</li>
+        <li>Security threats or abuse detection</li>
+      </ul>
+      <p class="text-sm mt-2">
+        Upon termination, your license to use the Platform will be revoked and access may be permanently disabled.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">14. DMCA & Copyright Claims</h2>
+      <p class="text-sm leading-relaxed">
+        If you believe any content on the Platform infringes your copyright, please submit a formal notice with the following information:
+      </p>
+      <ul class="list-decimal ml-6 text-sm space-y-2">
+        <li>Your name and contact info</li>
+        <li>Description of the copyrighted work</li>
+        <li>URL or description of the infringing content</li>
+        <li>A statement under penalty of perjury that your claim is accurate</li>
+        <li>Your signature (digital or physical)</li>
+      </ul>
+      <p class="text-sm mt-2">
+        Send DMCA notices to: <a href="mailto:legal@creonai.com" class="text-indigo-600">legal@creonai.com</a>
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">15. Feedback and Feature Requests</h2>
+      <p class="text-sm leading-relaxed">
+        By submitting feedback, ideas, or feature suggestions, you grant us a non-exclusive, royalty-free, perpetual, irrevocable license to use,
+        reproduce, modify, and publish your feedback for any purpose.
+      </p>
+      <p class="text-sm mt-2">
+        We appreciate your input, but we are under no obligation to implement suggestions.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">16. Beta Features & Experiments</h2>
+      <p class="text-sm leading-relaxed">
+        From time to time, we may offer access to experimental or beta features that are not production-ready. These features:
+      </p>
+      <ul class="list-disc ml-6 text-sm space-y-2">
+        <li>May be unstable, slow, or have limited functionality</li>
+        <li>May collect additional data for testing and improvement</li>
+        <li>Are subject to change or removal without notice</li>
+      </ul>
+      <p class="text-sm mt-2">
+        By using beta features, you acknowledge the inherent risk and agree not to hold CreonAI liable for errors or losses that may result.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">17. Third-Party Integrations</h2>
+      <p class="text-sm leading-relaxed">
+        The Platform may include features that connect to or integrate with third-party tools, services, or APIs (e.g. OpenAI, Gemini, Google, Discord, Stripe).
+        We do not control and are not responsible for the content, privacy practices, or terms of those third-party platforms.
+      </p>
+      <p class="text-sm mt-2">
+        Your interactions with third-party services are governed solely by their respective terms and privacy policies.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">18. Indemnification</h2>
+      <p class="text-sm leading-relaxed">
+        You agree to indemnify, defend, and hold harmless CreonAI, its affiliates, partners, officers, and employees from any and all claims,
+        liabilities, damages, losses, and expenses (including legal fees) arising from:
+      </p>
+      <ul class="list-disc ml-6 text-sm space-y-2">
+        <li>Your use or misuse of the Platform</li>
+        <li>Your violation of these Terms</li>
+        <li>Your content or inputs that infringe rights or break laws</li>
+      </ul>
+    </section>
+<!-- terms.html | chunk 4/10 | lines 301–400 -->
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">19. Disclaimers</h2>
+      <p class="text-sm leading-relaxed">
+        The Platform is provided on an “as is” and “as available” basis. CreonAI disclaims all warranties, express or implied, including but not limited to:
+      </p>
+      <ul class="list-disc ml-6 text-sm space-y-2">
+        <li>Merchantability or fitness for a particular purpose</li>
+        <li>Non-infringement of intellectual property</li>
+        <li>Availability, accuracy, or reliability of services or outputs</li>
+        <li>That any generated content is safe, legal, or fit for publication</li>
+      </ul>
+      <p class="text-sm mt-2">
+        Your use of the Platform is at your own risk. CreonAI is not responsible for any damage to your system or data.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">20. Limitation of Liability</h2>
+      <p class="text-sm leading-relaxed">
+        To the maximum extent permitted by applicable law, CreonAI shall not be liable for any indirect, incidental, special, consequential, or punitive damages,
+        or for any loss of profits, data, use, goodwill, or other intangible losses resulting from:
+      </p>
+      <ul class="list-disc ml-6 text-sm space-y-2">
+        <li>Your use of or inability to use the Platform</li>
+        <li>Unauthorized access or alteration of your transmissions or data</li>
+        <li>Any conduct or content of any third party on the Platform</li>
+        <li>Any content generated or retrieved using AI models</li>
+      </ul>
+      <p class="text-sm mt-2">
+        In no event shall our total liability to you exceed the greater of $100 USD or the amount paid to us in the preceding 12 months.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">21. Governing Law</h2>
+      <p class="text-sm leading-relaxed">
+        These Terms and your use of the Platform shall be governed by and construed in accordance with the laws of the United Kingdom,
+        without regard to its conflict of law provisions. You agree to submit to the exclusive jurisdiction of courts located in Glasgow, Scotland,
+        for the resolution of any disputes.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">22. Arbitration & Dispute Resolution</h2>
+      <p class="text-sm leading-relaxed">
+        For any dispute you have with CreonAI, you agree to first contact us at <a href="mailto:support@creonai.com" class="text-indigo-600">support@creonai.com</a>
+        and attempt to resolve the dispute with us informally. If we are unable to resolve the dispute within 60 days, we agree to resolve any claim, dispute, or controversy
+        through final and binding arbitration rather than in court.
+      </p>
+      <p class="text-sm mt-2">
+        Arbitration shall be conducted in English, in Glasgow, Scotland, under the rules of the Chartered Institute of Arbitrators (CIArb).
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">23. No Class Actions</h2>
+      <p class="text-sm leading-relaxed">
+        You agree to resolve any disputes with CreonAI on an individual basis. You may not bring a claim as a plaintiff or class member in a class, consolidated,
+        or representative action. Class arbitrations, class actions, private attorney general actions, and consolidation with other arbitrations are not allowed.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">24. Force Majeure</h2>
+      <p class="text-sm leading-relaxed">
+        We shall not be held responsible for any failure or delay in performance due to causes beyond our reasonable control, including but not limited to:
+        natural disasters, war, terrorism, strikes, cyberattacks, power outages, or failures of internet services or hosting providers.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">25. Entire Agreement</h2>
+      <p class="text-sm leading-relaxed">
+        These Terms, together with our Privacy Policy and any applicable Subscription Agreement, constitute the entire agreement between you and CreonAI
+        concerning the Platform and supersede any prior agreements or communications.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">26. Severability</h2>
+      <p class="text-sm leading-relaxed">
+        If any provision of these Terms is found to be invalid or unenforceable, the remaining provisions shall remain in full force and effect.
+        Any invalid provision shall be interpreted to best reflect the original intent of the parties.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">27. Waiver</h2>
+      <p class="text-sm leading-relaxed">
+        No waiver of any term or condition set forth in these Terms shall be deemed a further or continuing waiver of such term or condition or any other term or condition.
+        Any failure of CreonAI to assert a right or provision under these Terms shall not constitute a waiver of such right or provision.
+      </p>
+    </section>
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">28. Assignment</h2>
+      <p class="text-sm leading-relaxed">
+        You may not assign or transfer your rights or obligations under these Terms without our prior written consent. CreonAI may assign its rights and obligations
+        under these Terms in connection with a merger, acquisition, sale of assets, or by operation of law without notice to you.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">29. International Users</h2>
+      <p class="text-sm leading-relaxed">
+        The Platform is operated from the United Kingdom and intended for users located within jurisdictions where its use is legal. If you access the Platform
+        from outside the UK, you are responsible for compliance with your local laws and regulations.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">30. Export Control</h2>
+      <p class="text-sm leading-relaxed">
+        You may not use or otherwise export or re-export the Platform except as authorized by United Kingdom law and the laws of the jurisdiction in which the Platform
+        was obtained. In particular, but without limitation, the Platform may not be exported or re-exported to any UK-embargoed countries or to anyone on the UK Sanctions List.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">31. Age Restriction Notice</h2>
+      <p class="text-sm leading-relaxed">
+        If you are under the age of 13, you may not use the Platform. If you are a parent or guardian and believe your child is using our services in violation
+        of this policy, please contact us immediately at <a href="mailto:support@creonai.com" class="text-indigo-600">support@creonai.com</a>.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">32. AI Training Opt-Out</h2>
+      <p class="text-sm leading-relaxed">
+        CreonAI does not use your prompts or outputs to train its models unless you opt-in explicitly through platform settings. If you have previously opted in and wish
+        to opt out, you may update your settings or contact us directly.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">33. Beta Program Terms</h2>
+      <p class="text-sm leading-relaxed">
+        Participation in any private or public beta programs offered by CreonAI is optional and may be revoked at any time. All beta features are provided “as-is” and may be
+        discontinued without warning. Beta participation may require signing additional non-disclosure agreements.
+      </p>
+    </section>
+
+    <section class="mb-8">
+      <h2 class="text-xl font-semibold mb-4">34. Attribution & Branding</h2>
+      <p class="text-sm leading-relaxed">
+        CreonAI branding must be preserved in all free-tier exports unless you have an active Creator or Enterprise subscription that includes white-label rights.
+        All public references to CreonAI-generated content must clearly attribute the platform. Branding assets are available upon request.
+      </p>
+    </section>
+
+    <!-- ✦ PDF EXPORT / DOWNLOAD TERMS ✦ -->
+    <section class="mb-12 text-center">
+      <h2 class="text-xl font-semibold mb-4">Download Terms</h2>
+      <p class="text-sm mb-4 text-gray-500 dark:text-gray-400">Need a copy for your records?</p>
+      <button onclick="window.print()" class="inline-flex items-center px-5 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded">
+        Print / Save as PDF
+      </button>
+    </section>
+
+    <!-- ✦ ACCEPTANCE CHECKBOX (MODAL/FOOTER) ✦ -->
+    <section class="mt-10 border-t border-slate-200 dark:border-slate-700 pt-6">
+      <div class="flex items-start gap-2 text-sm">
+        <input type="checkbox" id="acceptTerms" class="mt-1 accent-indigo-600" />
+        <label for="acceptTerms" class="text-gray-600 dark:text-gray-400">
+          I have read and agree to the CreonAI Terms of Service and Privacy Policy.
+        </label>
+      </div>
+    </section>
+  </main>
+
+  <!-- ✦ FOOTER ✦ -->
+  <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-700 py-6 mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
+    &copy; <span x-text="new Date().getFullYear()"></span> CreonAI • Crafted with AI for creators, dreamers, and pioneers.
+  </footer>
+
+  <!-- ✦ THEME TOGGLE SCRIPT ✦ -->
+  <script>
+    function themeToggle() {
+      return {
+        isDark: false,
+        initTheme() {
+          this.isDark = localStorage.theme === 'dark' ||
+            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.classList.toggle('dark', this.isDark);
+        },
+        toggleTheme() {
+          this.isDark = !this.isDark;
+          localStorage.theme = this.isDark ? 'dark' : 'light';
+          document.documentElement.classList.toggle('dark', this.isDark);
+        }
+      }
+    }
+  </script>
+</body>
+</html>

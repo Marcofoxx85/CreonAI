@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" x-data="themeToggle()" x-init="initTheme()">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subscribe • CreonAI</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Alpine.js -->
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <style>
+    /* Dark/light radial background */
+    html.dark body {
+      background: radial-gradient(circle at 50% 0, rgba(99,102,241,0.15), transparent 70%), #0f172a;
+    }
+    html:not(.dark) body {
+      background: radial-gradient(circle at 50% 0, rgba(99,102,241,0.08), transparent 70%), #f9fafb;
+    }
+    /* Subscription card styling */
+    .subscribe-card {
+      background: rgba(23,27,37,0.97);
+      border: 1px solid #232732;
+      border-radius: 1.5rem;
+      box-shadow: 0 4px 32px 0 #23273222;
+      color: #e2e8f0;
+      transition: box-shadow .18s, border-color .18s;
+    }
+    .subscribe-card:hover {
+      box-shadow: 0 8px 40px 0 #4fd1c5aa;
+      border-color: #06b6d4;
+    }
+    /* Call-to-action button */
+    .subscribe-btn {
+      background: linear-gradient(90deg, #06b6d4 0%, #3b82f6 100%);
+      color: #0f172a;
+      font-weight: 700;
+      border-radius: .9rem;
+      padding: 1rem 2.5rem;
+      transition: filter .13s;
+      box-shadow: 0 2px 12px 0 #23273233;
+    }
+    .subscribe-btn:hover { filter: brightness(1.13); }
+    /* Price chip */
+    .price-chip {
+      background: #10131a;
+      color: #67e8f9;
+      font-size: 1.12rem;
+      font-weight: 700;
+      padding: .34em 1.2em;
+      border-radius: 999px;
+      margin-bottom: 1.1rem;
+      display: inline-block;
+      border: 1.5px solid #232732;
+    }
+    /* Responsive grid */
+    @media (max-width:700px) {
+      .subscribe-cards { grid-template-columns: 1fr!important; }
+    }
+  </style>
+</head>
+<body :class="isDark ? 'dark text-white' : 'text-gray-800'" class="min-h-screen flex flex-col transition-colors duration-300">
+
+  <!-- NAVBAR -->
+  <header class="sticky top-0 z-50 backdrop-blur border-b border-gray-200 dark:border-gray-700 bg-white/70 dark:bg-gray-900/70">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-2 text-2xl font-extrabold tracking-tight">
+        <img src="static/placeholders/logo.png" alt="CreonAI Logo" class="h-8 w-8" />
+        <span><span class="text-indigo-600">Creon</span><span class="dark:text-white">AI</span></span>
+      </a>
+      <nav class="hidden md:flex gap-8 text-sm font-medium">
+        <a href="index.html" class="hover:text-indigo-600">Home</a>
+        <a href="chat.html" class="hover:text-indigo-600">Chat</a>
+        <a href="subscribe.html" class="hover:text-indigo-600 font-bold underline">Subscribe</a>
+        <a href="profile.html" class="hover:text-indigo-600">Profile</a>
+      </nav>
+      <button @click="toggleTheme()" aria-label="Toggle dark mode" class="ml-4 p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 md:ml-8">
+        <template x-if="isDark">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path d="M21 12.79A9 9 0 0111.21 3 7 7 0 0021 12.79z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </template>
+        <template x-if="!isDark">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path d="M12 3v1m0 16v1m8.66-11.66l-.7.7M7.04 5.04l-.7-.7m14.14 9.9l-.7-.7M4 12H3m18 0h1m-3.66 6.34l.7-.7M4.7 17.66l.7.7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </template>
+      </button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="py-12 px-6 text-center">
+    <h1 class="text-4xl md:text-5xl font-extrabold mb-3 tracking-tight drop-shadow-lg">Upgrade Your Creativity</h1>
+    <p class="max-w-2xl mx-auto text-lg text-slate-400 mb-6">
+      Buy credits, unlock every tool, and scale your content empire.<br>No monthly fees—just pure generative power.
+    </p>
+  </section>
+
+  <!-- PRICING CARDS -->
+  <main class="flex-1 flex flex-col items-center justify-center px-4 pb-16">
+    <div class="subscribe-cards grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl w-full">
+
+      <!-- 50 Credits -->
+      <div class="subscribe-card p-8 flex flex-col items-center">
+        <div class="price-chip">£5</div>
+        <h2 class="text-2xl font-bold mb-2">50 Credits</h2>
+        <ul class="mb-6 mt-2 text-slate-400 text-sm text-left list-disc pl-5 w-full max-w-xs mx-auto">
+          <li>Great for testing and mini-projects</li>
+          <li>Use on any AI: Chat, Video, Audio, Image, PDF</li>
+          <li>No subscription, no commitment</li>
+        </ul>
+        <button class="subscribe-btn w-full mt-auto" @click="checkout('small')">Buy 50 Credits</button>
+      </div>
+
+      <!-- 200 Credits -->
+      <div class="subscribe-card p-8 flex flex-col items-center">
+        <div class="price-chip">£15</div>
+        <h2 class="text-2xl font-bold mb-2">200 Credits</h2>
+        <ul class="mb-6 mt-2 text-slate-400 text-sm text-left list-disc pl-5 w-full max-w-xs mx-auto">
+          <li>Best value for creators & agencies</li>
+          <li>Unlock all content labs and faster generation</li>
+          <li>Full access, no monthly fee</li>
+        </ul>
+        <button class="subscribe-btn w-full mt-auto" @click="checkout('large')">Buy 200 Credits</button>
+      </div>
+
+    </div>
+
+    <div class="mt-12 text-slate-400 text-sm">
+      <p>
+        Questions about pricing or bulk credits?
+        <a href="mailto:hello@creon.ai" class="underline hover:text-cyan-300">Contact us</a>
+      </p>
+    </div>
+  </main>
+
+  <!-- TESTIMONIALS -->
+  <section class="bg-white/80 dark:bg-gray-900/80 py-16">
+    <div class="max-w-4xl mx-auto px-6 text-center space-y-12">
+      <h2 class="text-3xl font-extrabold">What Our Creators Say</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <blockquote class="p-6 bg-[#161925] rounded-2xl shadow-lg text-slate-200">
+          “CreonAI transformed my workflow—credits never expire and the speed is unmatched!”
+          <footer class="mt-4 text-sm text-slate-400">— Alex P., YouTuber</footer>
+        </blockquote>
+        <blockquote class="p-6 bg-[#161925] rounded-2xl shadow-lg text-slate-200">
+          “I can’t believe how far £15 got me. This is a game-changer for my agency.”  
+          <footer class="mt-4 text-sm text-slate-400">— Mia K., Digital Marketer</footer>
+        </blockquote>
+        <blockquote class="p-6 bg-[#161925] rounded-2xl shadow-lg text-slate-200">
+          “No monthly fees is music to my ears—just pay as you go and create freely.”  
+          <footer class="mt-4 text-sm text-slate-400">— Jordan L., Indie Dev</footer>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
+  <!-- FAQ SECTION -->
+  <section class="px-6 py-16 max-w-4xl mx-auto">
+    <h2 class="text-3xl font-extrabold text-center mb-8">Frequently Asked Questions</h2>
+    <div x-data="{ open: null }" class="space-y-4">
+      <div class="border border-gray-700 rounded-lg">
+        <button @click="open === 1 ? open = null : open = 1"
+                class="w-full text-left px-6 py-4 flex justify-between items-center">
+          <span class="font-semibold">How long do credits last?</span>
+          <svg :class="open===1 ? 'transform rotate-180' : ''"
+               class="w-5 h-5 transition-transform"
+               fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <div x-show="open===1" x-collapse class="px-6 pb-4 text-slate-400">
+          Credits never expire—use them anytime, on any tool, at your leisure.
+        </div>
+      </div>
+
+      <div class="border border-gray-700 rounded-lg">
+        <button @click="open === 2 ? open = null : open = 2"
+                class="w-full text-left px-6 py-4 flex justify-between items-center">
+          <span class="font-semibold">Can I refund unused credits?</span>
+          <svg :class="open===2 ? 'transform rotate-180' : ''"
+               class="w-5 h-5 transition-transform"
+               fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <div x-show="open===2" x-collapse class="px-6 pb-4 text-slate-400">
+          Refunds are available within 14 days of purchase for any unused credits.
+        </div>
+      </div>
+
+      <div class="border border-gray-700 rounded-lg">
+        <button @click="open === 3 ? open = null : open = 3"
+                class="w-full text-left px-6 py-4 flex justify-between items-center">
+          <span class="font-semibold">Do you offer custom enterprise plans?</span>
+          <svg :class="open===3 ? 'transform rotate-180' : ''"
+               class="w-5 h-5 transition-transform"
+               fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <div x-show="open===3" x-collapse class="px-6 pb-4 text-slate-400">
+          Absolutely—reach out via <a href="mailto:enterprise@creon.ai" class="underline text-cyan-300">enterprise@creon.ai</a> for bulk pricing.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHECKOUT MODAL -->
+  <div x-data="checkoutModal()" x-show="show" x-cloak
+       class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
+    <div @click.away="close()" class="bg-gray-900 rounded-2xl w-full max-w-md mx-4 p-6 subscribe-card">
+      <h3 class="text-xl font-bold mb-4">Confirm Purchase</h3>
+      <template x-if="plan==='small'">
+        <p class="mb-6">You are about to buy <span class="font-semibold">50 credits</span> for <span class="price-chip">£5</span>.</p>
+      </template>
+      <template x-if="plan==='large'">
+        <p class="mb-6">You are about to buy <span class="font-semibold">200 credits</span> for <span class="price-chip">£15</span>.</p>
+      </template>
+      <div class="flex justify-end gap-4">
+        <button @click="close()" class="px-4 py-2 rounded text-slate-400 hover:text-white">Cancel</button>
+        <button @click="confirm()" class="subscribe-btn">Proceed to Payment</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-white/70 dark:bg-gray-900/70 border-t border-gray-200 dark:border-gray-700 py-8 mt-auto">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center text-sm text-slate-500">
+      <p>&copy; <span x-text="new Date().getFullYear()"></span> CreonAI. All rights reserved.</p>
+      <div class="flex gap-6 mt-4 md:mt-0">
+        <a href="terms.html" class="hover:text-indigo-600">Terms</a>
+        <a href="privacy.html" class="hover:text-indigo-600">Privacy</a>
+        <a href="support.html" class="hover:text-indigo-600">Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Alpine.js COMPONENT SCRIPTS -->
+  <script>
+    function themeToggle() {
+      return {
+        isDark: false,
+        initTheme() {
+          this.isDark = localStorage.theme==='dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.classList.toggle('dark', this.isDark);
+        },
+        toggleTheme() {
+          this.isDark = !this.isDark;
+          document.documentElement.classList.toggle('dark', this.isDark);
+          localStorage.theme = this.isDark ? 'dark' : 'light';
+        }
+      }
+    }
+
+    function checkoutModal() {
+      return {
+        show: false,
+        plan: null,
+        checkout(pl) {
+          this.plan = pl;
+          this.show = true;
+        },
+        confirm() {
+          // placeholder for Stripe/Pay integration
+          alert('Redirecting to payment for ' + this.plan);
+          this.close();
+        },
+        close() {
+          this.show = false;
+          this.plan = null;
+        }
+      }
+    }
+
+    document.querySelectorAll('.subscribe-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const plan = btn.getAttribute('@click').match(/checkout\('(\w+)'\)/)[1];
+        // manually trigger Alpine component
+        window.checkoutModal().checkout(plan);
+      });
+    });
+  </script>
+</body>
+</html>

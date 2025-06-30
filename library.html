@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  x-data="libraryApp()"
+  x-init="init()"
+  :class="{ dark: isDark }"
+>
+<!-- ╭───────────────────────────────────────────╮
+     │  HEAD                                     │
+     ╰───────────────────────────────────────────╯ -->
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  />
+  <title>CreonAI • Library</title>
+
+  <!-- fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- tailwind (CDN JIT) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          fontFamily: { inter: ["Inter", "system-ui", "sans-serif"] },
+          colors: {
+            accent: "#7C3AED",
+            bgdark: "#0f172a",
+            panel : "#1e293b"
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- alpine + plugins -->
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script defer src="https://unpkg.com/@alpinejs/intersect@3.x.x/dist/cdn.min.js"></script>
+
+  <!-- backdrop flourish -->
+  <style>
+    html.dark body{
+      background:
+        radial-gradient(circle at 50% 0, rgba(124 58 237 /.15),transparent 70%)
+        #0f172a;
+    }
+    html:not(.dark) body{
+      background:
+        radial-gradient(circle at 50% 0, rgba(124 58 237 /.08),transparent 70%)
+        #f9fafb;
+    }
+  </style>
+</head>
+<!-- /HEAD -->
+
+<!-- ╭───────────────────────────────────────────╮
+     │  BODY BEGIN                               │
+     ╰───────────────────────────────────────────╯ -->
+<body
+  class="font-inter antialiased transition-colors duration-300
+         text-slate-200 dark:text-slate-200"
+>
+
+  <!-- NAVBAR -->
+  <header
+    class="sticky top-0 z-40 w-full backdrop-blur border-b
+           border-slate-700/50 bg-bgdark/90"
+  >
+    <div class="max-w-7xl mx-auto px-6 sm:px-8 h-16 flex items-center">
+
+      <!-- brand -->
+      <a href="/" class="flex items-center gap-2 text-lg font-extrabold">
+        <svg class="h-6 w-6 text-accent" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M13 2 3 14h6v8l10-12h-6V2Z"/>
+        </svg>
+        <span><span class="text-accent">Creon</span><span class="text-white">AI</span></span>
+      </a>
+
+      <!-- spacer -->
+      <div class="flex-1"></div>
+
+      <!-- desktop nav -->
+      <nav class="hidden md:flex items-center gap-8 text-sm font-medium">
+        <a href="/"          class="hover:text-accent">Home</a>
+        <a href="/chat"      class="hover:text-accent">Chat</a>
+        <a href="/library"   class="text-accent font-semibold">Library</a>
+        <a href="/credits"   class="hover:text-accent">Credits</a>
+        <a href="/profile"   class="hover:text-accent">Profile</a>
+      </nav>
+
+      <!-- theme toggle -->
+      <button
+        @click="toggleTheme"
+        class="ml-4 p-2 rounded hover:bg-white/5"
+        aria-label="Toggle theme"
+      >
+        <svg
+          x-show="isDark"
+          class="h-5 w-5"
+          fill="none" stroke="currentColor" stroke-width="2"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M21 12.79A9 9 0 0111.21 3 7 7 0 0021 12.79z"/>
+        </svg>
+        <svg
+          x-show="!isDark"
+          class="h-5 w-5"
+          fill="none" stroke="currentColor" stroke-width="2"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M12 3v1m0 16v1m8.66-11.66l-.7.7M7.04 5.04l-.7-.7M4 12H3m18 0h1m-3.66 6.34l.7-.7M4.7 17.66l.7.7"/>
+        </svg>
+      </button>
+
+      <!-- mobile burger -->
+      <button
+        class="md:hidden ml-2 p-2 rounded hover:bg-white/5"
+        @click="navOpen=!navOpen"
+      >
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2"
+          viewBox="0 0 24 24" x-show="!navOpen">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2"
+          viewBox="0 0 24 24" x-show="navOpen">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- mobile dropdown -->
+    <nav
+      x-show="navOpen"
+      x-transition
+      class="md:hidden bg-bgdark border-t border-slate-700/50"
+      @click.away="navOpen=false"
+    >
+      <div class="px-6 py-4 flex flex-col gap-3 text-sm font-medium">
+        <a @click="navOpen=false" href="/"        class="hover:text-accent">Home</a>
+        <a @click="navOpen=false" href="/chat"    class="hover:text-accent">Chat</a>
+        <a @click="navOpen=false" href="/library" class="text-accent">Library</a>
+        <a @click="navOpen=false" href="/credits" class="hover:text-accent">Credits</a>
+        <a @click="navOpen=false" href="/profile" class="hover:text-accent">Profile</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- additional sections begin next chunk -->
+<!-- templates/library.html  |  chunk 2/8  |  lines 151-300 -->
+
+  <!-- ╭───────────────────────────────────────────╮
+       │  PAGE WRAPPER                            │
+       ╰───────────────────────────────────────────╯ -->
+  <main class="max-w-7xl mx-auto px-6 sm:px-8 py-12 space-y-16">
+
+    <!-- ╭───────────────────────────────────────╮
+         │  PAGE HEADER                          │
+         ╰───────────────────────────────────────╯ -->
+    <section class="flex flex-col sm:flex-row sm:items-center gap-6">
+      <div class="flex-1 space-y-3">
+        <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight">
+          Asset&nbsp;Library
+        </h1>
+        <p class="text-slate-400 max-w-md">
+          Browse everything you’ve generated — videos, images, audio, PDFs — all
+          neatly organised, searchable and ready to download or remix.
+        </p>
+      </div>
+
+      <!-- quick-stats -->
+      <div class="grid grid-cols-3 gap-4 text-center text-xs">
+        <div>
+          <span class="text-accent text-xl font-bold" x-text="stats.images"></span><br/>Images
+        </div>
+        <div>
+          <span class="text-accent text-xl font-bold" x-text="stats.videos"></span><br/>Videos
+        </div>
+        <div>
+          <span class="text-accent text-xl font-bold" x-text="stats.audio"></span><br/>Audio
+        </div>
+      </div>
+    </section>
+
+    <!-- ╭───────────────────────────────────────╮
+         │  TOOLBAR (search + filters)           │
+         ╰───────────────────────────────────────╯ -->
+    <section
+      class="sticky top-[4.5rem] z-30 bg-bgdark/90 backdrop-blur
+             border border-slate-700/40 rounded-xl p-4 flex flex-wrap
+             gap-4 items-center"
+    >
+      <!-- search -->
+      <div class="relative flex-1 min-w-[10rem]">
+        <input
+          type="text"
+          placeholder="Search assets…"
+          x-model="query"
+          @input="debouncedSearch"
+          class="w-full pl-10 pr-3 py-2 rounded bg-panel border border-slate-600
+                 text-sm placeholder-slate-500 focus:outline-none focus:ring-1
+                 focus:ring-accent"
+        />
+        <svg class="absolute left-3 top-2.5 h-4 w-4 text-slate-500"
+          fill="none" stroke="currentColor" stroke-width="2"
+          viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
+          d="M21 21l-4.35-4.35M9 17a8 8 0 100-16 8 8 0 000 16z"/></svg>
+      </div>
+
+      <!-- type filter -->
+      <select
+        x-model="filters.type"
+        @change="applyFilters"
+        class="px-3 py-2 rounded bg-panel border border-slate-600 text-sm
+               focus:outline-none focus:ring-1 focus:ring-accent"
+      >
+        <option value="">All types</option>
+        <option value="image">Images</option>
+        <option value="video">Videos</option>
+        <option value="audio">Audio</option>
+        <option value="pdf">PDF</option>
+        <option value="text">Text</option>
+      </select>
+
+      <!-- date range -->
+      <input
+        type="date"
+        x-model="filters.after"
+        @change="applyFilters"
+        class="px-2 py-2 rounded bg-panel border border-slate-600 text-sm
+               focus:outline-none focus:ring-1 focus:ring-accent"
+      />
+      <span class="text-xs text-slate-400">to</span>
+      <input
+        type="date"
+        x-model="filters.before"
+        @change="applyFilters"
+        class="px-2 py-2 rounded bg-panel border border-slate-600 text-sm
+               focus:outline-none focus:ring-1 focus:ring-accent"
+      />
+
+      <!-- new upload stub -->
+      <button
+        @click="openUploadModal"
+        class="ml-auto flex items-center gap-2 px-4 py-2 rounded-lg bg-accent
+               text-black text-sm font-semibold hover:bg-accent/80 transition"
+      >
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"
+          viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
+          d="M12 4v16m8-8H4"/></svg>
+        Upload
+      </button>
+    </section>
+
+    <!-- grid continues in next chunk -->
+  </main>
+
+  <!-- main grid / modals will follow -->
+
+<!-- CONTINUE? -->
+<!-- templates/library.html  |  chunk 3/8  |  lines 301-450 -->
+
+    <!-- ╭───────────────────────────────────────╮
+         │  ASSET GRID                          │
+         ╰───────────────────────────────────────╯ -->
+    <section
+      id="assetGrid"
+      class="grid gap-6 mt-10
+             sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4
+             auto-rows-[1fr]"
+    >
+      <!-- asset card template (reused by x-for) -->
+      <template id="asset-card-template">
+        <article
+          class="group relative flex flex-col rounded-xl overflow-hidden
+                 bg-panel/70 backdrop-blur border border-white/10 shadow
+                 hover:shadow-xl transition"
+        >
+          <!-- media slot -->
+          <div class="relative">
+            <slot name="thumb"></slot>
+            <!-- type badge -->
+            <span
+              class="absolute top-2 left-2 px-2 py-0.5 text-[10px] uppercase
+                     bg-black/60 backdrop-blur rounded text-white
+                     pointer-events-none"
+              x-text="badge"
+            ></span>
+            <!-- quick actions -->
+            <div
+              class="absolute inset-0 flex items-center justify-center gap-3
+                     opacity-0 group-hover:opacity-100 transition"
+            >
+              <button
+                @click.stop="preview(id)"
+                class="p-2 rounded-full bg-black/60 backdrop-blur hover:bg-accent
+                       transition"
+                aria-label="Preview"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"
+                  viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7
+                       c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7z"/>
+                </svg>
+              </button>
+              <button
+                @click.stop="download(id)"
+                class="p-2 rounded-full bg-black/60 backdrop-blur hover:bg-accent
+                       transition"
+                aria-label="Download"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"
+                  viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2"/>
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M7 10l5 5m0 0l5-5m-5 5V4"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- meta -->
+          <div class="p-4 space-y-1 text-xs">
+            <p class="font-semibold truncate" x-text="title"></p>
+            <p class="text-slate-400"
+               x-text="new Date(created).toLocaleDateString()"></p>
+          </div>
+        </article>
+      </template>
+
+      <!-- render cards -->
+      <template
+        x-for="asset in filtered"
+        :key="asset.id"
+      >
+        <div
+          x-data="card(asset)"
+          x-init="mount()"
+        ></div>
+      </template>
+    </section>
+
+    <!-- grid / app continues next chunk -->
+  </main>
+
+  <!-- ╭───────────────────────────────────────────╮
+       │  PREVIEW MODAL                           │
+       ╰───────────────────────────────────────────╯ -->
+  <div
+    x-show="modal.open"
+    x-transition
+    x-cloak
+    class="fixed inset-0 z-50 flex items-center justify-center
+           bg-black/70 backdrop-blur p-6"
+  >
+    <div
+      class="relative max-w-3xl w-full bg-panel rounded-lg shadow-lg
+             overflow-hidden"
+    >
+      <!-- close -->
+      <button
+        @click="closeModal"
+        class="absolute top-3 right-3 p-2 rounded hover:bg-white/5"
+      >
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+
+      <!-- dynamic content -->
+      <template x-if="modal.type === 'image'">
+        <img :src="modal.src" alt="" class="w-full object-contain"/>
+      </template>
+
+      <template x-if="modal.type === 'video'">
+        <video controls :src="modal.src" class="w-full"></video>
+      </template>
+
+      <template x-if="modal.type === 'audio'">
+        <audio controls :src="modal.src" class="w-full"></audio>
+      </template>
+
+      <template x-if="modal.type === 'pdf'">
+        <iframe :src="modal.src" class="w-full h-[80vh]"></iframe>
+      </template>
+    </div>
+  </div>
+
+<!-- CONTINUE? -->
+<!-- templates/library.html  |  chunk 4/8  |  lines 451-600 -->
+
+  <!-- ╭───────────────────────────────────────────╮
+       │  EMPTY STATE (if no assets found)        │
+       ╰───────────────────────────────────────────╯ -->
+  <section
+    x-show="filtered.length === 0"
+    class="text-center py-24 text-slate-400"
+  >
+    <svg class="mx-auto h-12 w-12 mb-4" fill="none" stroke="currentColor" stroke-width="1.5"
+      viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round"
+        d="M3 15.75V6.75A2.25 2.25 0 015.25 4.5h13.5A2.25 2.25 0 0121 6.75v9M3 15.75h18M3 15.75l2.25 2.25m13.5 0L21 15.75"/>
+    </svg>
+    <h3 class="text-sm font-semibold">No assets found.</h3>
+    <p class="text-xs mt-2">Try a different filter or create something new!</p>
+  </section>
+
+  <!-- ╭───────────────────────────────────────────╮
+       │  TOAST NOTIFICATIONS                     │
+       ╰───────────────────────────────────────────╯ -->
+  <div
+    x-data="$store.toaster"
+    class="fixed bottom-4 right-4 space-y-2 z-50"
+  >
+    <template x-for="(toast, i) in list" :key="i">
+      <div
+        x-text="toast"
+        class="bg-accent text-black font-semibold rounded px-4 py-2 text-sm shadow"
+      ></div>
+    </template>
+  </div>
+
+  <!-- ╭───────────────────────────────────────────╮
+       │  ALPINE STATE INIT                       │
+       ╰───────────────────────────────────────────╯ -->
+  <script>
+    function libraryApp () {
+      return {
+        // core state
+        search: "",
+        assets: [],
+        filtered: [],
+        modal: {
+          open: false,
+          type: null,
+          src: null
+        },
+
+        // init method
+        init () {
+          this.fetchAssets();
+        },
+
+        // fetch & filter
+        fetchAssets () {
+          // simulate fetch - replace with actual API call
+          this.assets = [
+            { id: 1, title: "Yeti Dance", created: "2025-06-01", type: "video", src: "/media/yeti.mp4" },
+            { id: 2, title: "Robot Voice", created: "2025-06-10", type: "audio", src: "/media/robot.mp3" },
+            { id: 3, title: "AI Poster", created: "2025-06-12", type: "image", src: "/media/poster.png" },
+            { id: 4, title: "Showreel", created: "2025-06-14", type: "video", src: "/media/showreel.mp4" },
+          ];
+          this.filtered = this.assets;
+        },
+        filterAssets () {
+          const q = this.search.toLowerCase();
+          this.filtered = this.assets.filter(a => a.title.toLowerCase().includes(q));
+        },
+
+        // modal control
+        preview (id) {
+          const asset = this.assets.find(a => a.id === id);
+          this.modal.type = asset.type;
+          this.modal.src  = asset.src;
+          this.modal.open = true;
+        },
+        closeModal () {
+          this.modal.open = false;
+        },
+        download (id) {
+          const asset = this.assets.find(a => a.id === id);
+          const link = document.createElement('a');
+          link.href = asset.src;
+          link.download = asset.title;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        },
+      };
+    }
+
+    function card (data) {
+      return {
+        id: data.id,
+        title: data.title,
+        created: data.created,
+        type: data.type,
+        src: data.src,
+        badge: data.type.toUpperCase(),
+        mount () {
+          const template = document.getElementById("asset-card-template");
+          const clone = template.content.cloneNode(true);
+          const thumb = clone.querySelector("[name='thumb']");
+          const wrapper = document.currentScript?.parentElement || this.$el;
+
+          // insert correct preview
+          let el;
+          if (this.type === "image") {
+            el = document.createElement("img");
+            el.src = this.src;
+            el.className = "w-full aspect-video object-cover";
+          } else if (this.type === "video") {
+            el = document.createElement("video");
+            el.src = this.src;
+            el.className = "w-full aspect-video object-cover";
+            el.muted = true;
+            el.autoplay = true;
+            el.loop = true;
+          } else if (this.type === "audio") {
+            el = document.createElement("div");
+            el.innerHTML = `
+              <div class="flex items-center justify-center h-48 bg-black/30 text-white">
+                <svg class="h-12 w-12" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 19V6l12-2v13"/>
+                </svg>
+              </div>
+            `;
+          } else {
+            el = document.createElement("div");
+            el.className = "h-48 bg-gray-800 text-white flex items-center justify-center";
+            el.textContent = this.type;
+          }
+
+          // replace <slot name="thumb">
+          const slot = clone.querySelector("slot[name='thumb']");
+          slot.replaceWith(el);
+
+          wrapper.appendChild(clone);
+        }
+      };
+    }
+  </script>
+
+  <!-- /body close in next chunk -->
+<!-- CONTINUE? -->
+<!-- templates/library.html  |  chunk 5/8  |  lines 601-750 -->
+
+  <!-- ╭───────────────────────────────────────────╮
+       │  SLOT TEMPLATE (for dynamic cards)       │
+       ╰───────────────────────────────────────────╯ -->
+  <template id="asset-card-template">
+    <div class="flex flex-col bg-slate-800/60 rounded-lg overflow-hidden shadow border border-slate-700/50">
+      <!-- preview slot -->
+      <div name="thumb" class="relative">
+        <!-- replaced by image/video/audio placeholder -->
+      </div>
+
+      <!-- details -->
+      <div class="p-4 flex-1 flex flex-col justify-between space-y-2">
+        <h3 class="text-base font-semibold text-white truncate" x-text="title"></h3>
+        <p class="text-xs text-slate-400" x-text="created"></p>
+
+        <!-- actions -->
+        <div class="flex justify-between items-center">
+          <span class="text-[10px] font-medium bg-slate-700 text-slate-300 px-2 py-0.5 rounded-full" x-text="badge"></span>
+          <div class="flex items-center gap-2">
+            <button
+              @click="$store.app.preview(id)"
+              class="text-accent text-xs font-semibold hover:underline"
+            >
+              Preview
+            </button>
+            <button
+              @click="$store.app.download(id)"
+              class="text-xs text-slate-400 hover:text-white transition"
+              title="Download"
+            >
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"
+                viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 12v8m0 0l-4-4m4 4l4-4M4 12h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <!-- ╭───────────────────────────────────────────╮
+       │  SAMPLE ASSETS PREVIEW MODAL             │
+       ╰───────────────────────────────────────────╯ -->
+  <div
+    x-show="modal.open"
+    x-transition
+    @keydown.escape.window="closeModal"
+    class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center"
+  >
+    <div class="relative bg-bgdark rounded-lg shadow-xl max-w-3xl w-full p-6">
+      <!-- close button -->
+      <button
+        @click="closeModal"
+        class="absolute top-3 right-3 p-1 rounded hover:bg-white/10"
+      >
+        <svg class="h-5 w-5 text-white" fill="none" stroke="currentColor" stroke-width="2"
+          viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+            d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <!-- dynamic preview -->
+      <template x-if="modal.type === 'image'">
+        <img :src="modal.src" class="rounded max-h-[70vh] mx-auto" />
+      </template>
+      <template x-if="modal.type === 'video'">
+        <video controls class="rounded max-h-[70vh] mx-auto">
+          <source :src="modal.src" type="video/mp4" />
+        </video>
+      </template>
+      <template x-if="modal.type === 'audio'">
+        <audio controls class="w-full">
+          <source :src="modal.src" type="audio/mpeg" />
+        </audio>
+      </template>
+      <template x-if="modal.type !== 'image' && modal.type !== 'video' && modal.type !== 'audio'">
+        <p class="text-white text-center">Preview not available for this file type.</p>
+      </template>
+    </div>
+  </div>
+
+  <!-- placeholder padding for layout spacing -->
+  <div class="h-32"></div>
+
+  <!-- closing tags and optional extras will follow -->
+<!-- CONTINUE? -->
+<!-- templates/library.html  |  chunk 6/8  |  lines 751-900 -->
+
+  <!-- ╭───────────────────────────────────────────╮
+       │  PERSISTENT FOOTER BAR                   │
+       ╰───────────────────────────────────────────╯ -->
+  <footer
+    class="fixed bottom-0 inset-x-0 bg-bgdark border-t border-slate-700/50 px-6 py-4 text-xs
+           flex items-center justify-between text-slate-500 z-40"
+  >
+    <div>© <span x-text="year"></span> CreonAI — Your Generative Workspace</div>
+    <div class="hidden sm:flex items-center gap-4">
+      <a href="/terms" class="hover:text-accent">Terms</a>
+      <a href="/privacy" class="hover:text-accent">Privacy</a>
+      <a href="/contact" class="hover:text-accent">Contact</a>
+    </div>
+  </footer>
+
+  <!-- ╭───────────────────────────────────────────╮
+       │  LOADER SPINNER (ON FETCH)               │
+       ╰───────────────────────────────────────────╯ -->
+  <div
+    x-show="loading"
+    x-transition.opacity
+    class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50"
+  >
+    <div class="flex flex-col items-center gap-4">
+      <svg class="animate-spin h-10 w-10 text-accent" fill="none" viewBox="0 0 24 24"
+        stroke="currentColor" stroke-width="3">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M12 4v1m0 14v1m8.66-10.66l-.71.71M4.05 19.95l-.71.71M20 12h1M3 12H2m17.66 4.95l-.71-.71M4.05 4.05l-.71-.71" />
+      </svg>
+      <p class="text-sm text-slate-300">Loading your assets…</p>
+    </div>
+  </div>
+
+  <!-- ╭───────────────────────────────────────────╮
+       │  DEBUG PANEL (OPTIONAL DEV TOOLS)        │
+       ╰───────────────────────────────────────────╯ -->
+  <div x-show="debug" class="fixed bottom-0 right-0 p-4 text-xs bg-black text-green-400 z-50">
+    <pre x-text="JSON.stringify(assets, null, 2)"></pre>
+  </div>
+
+  <!-- END WRAPPER -->
+</main>
+
+<!-- CONTINUE with Alpine.js setup + closing tags -->
+<!-- templates/library.html  |  chunk 7/8  |  lines 901-1050 -->
+
+<!-- ╭───────────────────────────────────────────╮
+     │  ALPINE COMPONENT LOGIC                  │
+     ╰───────────────────────────────────────────╯ -->
+<script>
+  function libraryApp () {
+    return {
+      year: new Date().getFullYear(),
+      isDark: false,
+      navOpen: false,
+      loading: true,
+      debug: false,
+
+      assets: [],
+      activeTab: 'all',
+
+      /* INIT */
+      init () {
+        this.setTheme()
+        this.fetchAssets()
+      },
+
+      /* THEME TOGGLE */
+      toggleTheme () {
+        this.isDark = !this.isDark
+        localStorage.setItem("theme", this.isDark ? "dark" : "light")
+        document.documentElement.classList.toggle("dark", this.isDark)
+      },
+      setTheme () {
+        const saved = localStorage.getItem("theme")
+        this.isDark = saved
+          ? saved === "dark"
+          : matchMedia("(prefers-color-scheme: dark)").matches
+        document.documentElement.classList.toggle("dark", this.isDark)
+      },
+
+      /* ASSET FETCH */
+      async fetchAssets () {
+        try {
+          const res = await fetch('/api/assets')
+          const data = await res.json()
+          this.assets = data
+        } catch (err) {
+          alert('Failed to fetch assets.')
+        } finally {
+          this.loading = false
+        }
+      },
+
+      /* FILTERING */
+      filteredAssets () {
+        if (this.activeTab === 'all') return this.assets
+        return this.assets.filter(a => a.type === this.activeTab)
+      }
+    }
+  }
+</script>
+
+<!-- CONTINUE for final closing tags -->
+<!-- templates/library.html  |  chunk 8/8  |  lines 1051-1100 -->
+
+<!-- ╭───────────────────────────────────────────╮
+     │  SMOOTH SCROLL + POLYFILL                │
+     ╰───────────────────────────────────────────╯ -->
+<script>
+  if (!('scrollBehavior' in document.documentElement.style)) {
+    import('https://cdn.jsdelivr.net/npm/smoothscroll-polyfill@0.4.4/dist/smoothscroll.min.js')
+      .then(mod => mod.polyfill())
+  }
+</script>
+
+</body>
+</html>

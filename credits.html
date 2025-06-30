@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html
+  lang="en"
+  x-data="creditsPage()"
+  x-init="initCredits()"
+  :class="{ dark: isDark }"
+>
+<!-- ✦ HEAD ✦ -->
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Credits • CreonAI</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;600;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- TailwindCSS (JIT) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            inter: ['Inter', 'system-ui', 'sans-serif'],
+          },
+          colors: {
+            accent: '#7C3AED',
+            bgdark: '#0f172a',
+            panel: '#1e293b',
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- AlpineJS -->
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <!-- Custom Scrollbar + Base -->
+  <style>
+    html,
+    body {
+      background: #0f172a;
+      font-family: Inter, sans-serif;
+    }
+
+    ::-webkit-scrollbar {
+      width: 10px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 6px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+  </style>
+</head>
+<!-- /HEAD -->
+
+<!-- ✦ BODY ✦ -->
+<body class="text-slate-200 antialiased transition-colors duration-300">
+  <!-- ╭───────── NAVBAR ─────────╮ -->
+  <header
+    class="sticky top-0 z-50 w-full backdrop-blur border-b border-slate-700/40 bg-bgdark/90"
+  >
+    <div
+      class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between"
+    >
+      <!-- Brand -->
+      <a
+        href="/"
+        class="flex items-center gap-2 text-xl font-extrabold tracking-tight"
+      >
+        <svg
+          class="h-6 w-6 text-accent"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path d="M13 2 3 14h6v8l10-12h-6V2Z" />
+        </svg>
+        <span class="text-white">Creon<span class="text-accent">AI</span></span>
+      </a>
+
+      <!-- Nav links -->
+      <nav class="hidden md:flex gap-8 text-sm font-medium">
+        <a href="/" class="hover:text-accent">Home</a>
+        <a href="/chat" class="hover:text-accent">Chat</a>
+        <a href="/library" class="hover:text-accent">Library</a>
+        <a href="/subscribe" class="hover:text-accent">Subscribe</a>
+        <a href="/why-us" class="hover:text-accent">Why Us</a>
+        <a href="/profile" class="hover:text-accent">Profile</a>
+      </nav>
+
+      <!-- Theme toggle -->
+      <button
+        @click="toggleTheme"
+        aria-label="Toggle Theme"
+        class="ml-4 p-2 rounded hover:bg-white/5"
+      >
+        <template x-if="isDark">
+          <svg
+            class="h-5 w-5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 3v1m0 16v1m8.66-11.66l-.7.7M7.04 5.04l-.7-.7M4 12H3m18 0h1m-3.66 6.34l.7-.7M4.7 17.66l.7.7"
+            />
+          </svg>
+        </template>
+        <template x-if="!isDark">
+          <svg
+            class="h-5 w-5"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              d="M17.293 13.293a8 8 0 11-10.586-10.586A8 8 0 0017.293 13.293z"
+            />
+          </svg>
+        </template>
+      </button>
+    </div>
+  </header>
+<!-- credits.html | chunk 2/8 | lines 151–300 -->
+
+  <!-- ╭───────── HERO SECTION ─────────╮ -->
+  <section
+    class="flex flex-col items-center justify-center text-center px-6 py-24 gap-8"
+  >
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight">
+      Manage Your Credits
+    </h1>
+
+    <p class="text-slate-400 text-lg max-w-xl">
+      Credits power your AI usage — each message, image, or video deducts from your balance.
+      Top up anytime, or subscribe for bonus perks.
+    </p>
+
+    <!-- Balance card -->
+    <div
+      class="panel rounded-3xl p-10 inline-block text-center shadow-lg w-full max-w-xs"
+    >
+      <p class="text-sm text-slate-400 mb-2">Available Balance</p>
+      <p
+        id="credit-balance"
+        x-text="credits"
+        class="text-6xl font-black text-accent"
+      ></p>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="flex flex-wrap justify-center gap-4">
+      <a
+        href="/subscribe"
+        class="bg-accent text-black font-semibold px-8 py-4 rounded-xl shadow-md hover:bg-accent/80 transition"
+      >
+        Get More Credits
+      </a>
+      <button
+        class="panel px-8 py-4 rounded-xl font-semibold text-sm hover:shadow-lg"
+        @click="addCredits(10)"
+      >
+        +10 Demo Credits
+      </button>
+    </div>
+  </section>
+
+  <!-- ╭───────── CREDIT OPTIONS GRID ─────────╮ -->
+  <section
+    class="max-w-6xl mx-auto px-6 sm:px-8 py-16"
+  >
+    <h2 class="text-2xl sm:text-3xl font-bold text-center mb-10">
+      Choose a Package
+<!-- credits.html | chunk 3/8 | lines 301–450 -->
+
+    <!-- credits tier grid -->
+    <div class="grid gap-8 md:grid-cols-3">
+      <!-- Tier 1 -->
+      <div
+        class="panel rounded-xl p-8 shadow space-y-4 flex flex-col items-center"
+      >
+        <h3 class="text-xl font-semibold">Starter Pack</h3>
+        <p class="text-slate-400 text-sm">Great for casual users</p>
+        <div class="text-4xl font-bold text-accent">100 credits</div>
+        <div class="text-lg text-white font-semibold">$5</div>
+        <button
+          class="btn w-full py-2 rounded text-black font-semibold"
+        >
+          Buy Now
+        </button>
+      </div>
+
+      <!-- Tier 2 -->
+      <div
+        class="panel rounded-xl p-8 shadow space-y-4 flex flex-col items-center border-2 border-accent"
+      >
+        <h3 class="text-xl font-semibold">Pro Pack</h3>
+        <p class="text-slate-400 text-sm">For creators & freelancers</p>
+        <div class="text-4xl font-bold text-accent">500 credits</div>
+        <div class="text-lg text-white font-semibold">$20</div>
+        <button
+          class="btn w-full py-2 rounded text-black font-semibold"
+        >
+          Buy Now
+        </button>
+      </div>
+
+      <!-- Tier 3 -->
+      <div
+        class="panel rounded-xl p-8 shadow space-y-4 flex flex-col items-center"
+      >
+        <h3 class="text-xl font-semibold">Studio Pack</h3>
+        <p class="text-slate-400 text-sm">Teams & power users</p>
+        <div class="text-4xl font-bold text-accent">1500 credits</div>
+        <div class="text-lg text-white font-semibold">$49</div>
+        <button
+          class="btn w-full py-2 rounded text-black font-semibold"
+        >
+          Buy Now
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- testimonials / will continue next chunk -->
+<!-- credits.html | chunk 4/8 | lines 451–600 -->
+
+  <!-- ╭───────────────────────────────────────────╮
+       │  TESTIMONIALS (Carousel)                 │
+       ╰───────────────────────────────────────────╯ -->
+  <section class="py-24 px-6 max-w-5xl mx-auto text-center space-y-16">
+    <h2 class="text-3xl font-bold">Loved by Creators</h2>
+
+    <div
+      x-data="{ active: 0, quotes: [
+        { name: 'Luna', job: 'AI TikTok Creator', quote: 'CreonAI helped me batch-create 20 shorts a day. The credit system makes it feel like magic.' },
+        { name: 'Marcus', job: 'YouTube Editor', quote: 'No more switching tools. Everything’s here. Credits last forever and scale well.' },
+        { name: 'Aya', job: 'Indie Musician', quote: 'I use CreonAI to preview AI music videos. It’s quick, accurate, and totally worth the credits.' }
+      ]}"
+      class="relative"
+    >
+      <div class="h-32 md:h-28 overflow-hidden">
+        <template x-for="(t, i) in quotes" :key="i">
+          <blockquote
+            x-show="active === i"
+            x-transition
+            class="text-slate-300 text-lg"
+            x-text="t.quote"
+          ></blockquote>
+        </template>
+      </div>
+
+      <!-- Name / Job -->
+      <div class="mt-4">
+        <template x-for="(t, i) in quotes" :key="i">
+          <div
+            x-show="active === i"
+            x-transition
+            class="text-sm text-slate-400"
+            x-text="`${t.name} — ${t.job}`"
+          ></div>
+        </template>
+      </div>
+
+      <!-- Dots -->
+      <div class="flex justify-center gap-2 mt-6">
+        <template x-for="(t, i) in quotes" :key="i">
+          <button
+            @click="active = i"
+            class="h-3 w-3 rounded-full"
+            :class="active === i ? 'bg-accent' : 'bg-slate-600/50'"
+          ></button>
+        </template>
+      </div>
+    </div>
+  </section>
+
+  <!-- continue? -->
+<!-- credits.html | chunk 5/8 | lines 601–750 -->
+
+  <!-- ╭───────────────────────────────────────────╮
+       │  FAQ ACCORDION                           │
+       ╰───────────────────────────────────────────╯ -->
+  <section class="py-24 px-6 max-w-4xl mx-auto space-y-12">
+    <h2 class="text-3xl font-bold text-center">Credits FAQ</h2>
+
+    <div class="space-y-6" x-data="{ open: null }">
+      <!-- item 1 -->
+      <div class="border border-slate-700/50 rounded-lg overflow-hidden">
+        <button
+          @click="open = open === 1 ? null : 1"
+          class="w-full text-left px-6 py-4 text-sm font-semibold flex justify-between items-center bg-panel"
+        >
+          Do credits expire?
+          <svg class="h-5 w-5 transition-transform"
+               :class="open === 1 ? 'rotate-180 text-accent' : 'text-slate-500'"
+               fill="none" stroke="currentColor" stroke-width="2"
+               viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <div
+          x-show="open === 1"
+          x-collapse
+          class="px-6 py-4 text-sm text-slate-300 bg-panel/80"
+        >
+          Nope! Credits never expire and roll over every month. Use them whenever you want.
+        </div>
+      </div>
+
+      <!-- item 2 -->
+      <div class="border border-slate-700/50 rounded-lg overflow-hidden">
+        <button
+          @click="open = open === 2 ? null : 2"
+          class="w-full text-left px-6 py-4 text-sm font-semibold flex justify-between items-center bg-panel"
+        >
+          Can I transfer credits to another user?
+          <svg class="h-5 w-5 transition-transform"
+               :class="open === 2 ? 'rotate-180 text-accent' : 'text-slate-500'"
+               fill="none" stroke="currentColor" stroke-width="2"
+               viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <div
+          x-show="open === 2"
+          x-collapse
+          class="px-6 py-4 text-sm text-slate-300 bg-panel/80"
+        >
+          Not yet — but we’re working on credit gifting and team sharing features soon!
+        </div>
+      </div>
+
+      <!-- item 3 -->
+      <div class="border border-slate-700/50 rounded-lg overflow-hidden">
+        <button
+          @click="open = open === 3 ? null : 3"
+          class="w-full text-left px-6 py-4 text-sm font-semibold flex justify-between items-center bg-panel"
+        >
+          What if I run out of credits mid-chat?
+          <svg class="h-5 w-5 transition-transform"
+               :class="open === 3 ? 'rotate-180 text-accent' : 'text-slate-500'"
+               fill="none" stroke="currentColor" stroke-width="2"
+               viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <div
+          x-show="open === 3"
+          x-collapse
+          class="px-6 py-4 text-sm text-slate-300 bg-panel/80"
+        >
+          You’ll see a gentle popup and the send button will disable. Just top-up and continue instantly.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- security + payment info next -->
+  <!-- ╭───────────────────────────────────────────╮
+       │  SECURITY & PAYMENT DETAILS              │
+       ╰───────────────────────────────────────────╯ -->
+  <section class="px-6 py-20 max-w-5xl mx-auto space-y-16">
+    <div class="grid md:grid-cols-2 gap-12">
+
+      <!-- Payment Security -->
+      <div class="bg-panel rounded-xl border border-slate-700/50 p-8 space-y-4 shadow backdrop-blur">
+        <h3 class="text-xl font-bold text-accent">Secure Payments</h3>
+        <p class="text-sm text-slate-300">
+          All transactions are processed via Stripe using 256-bit encryption and PCI-compliant architecture.
+        </p>
+        <img src="static/placeholders/secure-payment.svg" alt="Secure Payment Icon"
+             class="h-12 w-12 opacity-80 mt-2" />
+      </div>
+
+      <!-- Transparent Billing -->
+      <div class="bg-panel rounded-xl border border-slate-700/50 p-8 space-y-4 shadow backdrop-blur">
+        <h3 class="text-xl font-bold text-accent">Transparent Billing</h3>
+        <p class="text-sm text-slate-300">
+          No hidden fees. Buy credits or subscribe monthly — cancel anytime. You’re always in control.
+        </p>
+        <img src="static/placeholders/billing-icon.svg" alt="Billing Icon"
+             class="h-12 w-12 opacity-80 mt-2" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ╭───────────────────────────────────────────╮
+       │  CREDIT PACKS / PRICING OPTIONS          │
+       ╰───────────────────────────────────────────╯ -->
+  <section class="px-6 pb-24 max-w-6xl mx-auto">
+    <h2 class="text-3xl font-bold text-center mb-12">Buy Credit Packs</h2>
+
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Pack 1 -->
+      <div class="bg-panel rounded-2xl p-8 shadow-lg space-y-4 border border-slate-700/50 text-center">
+        <h4 class="text-lg font-semibold">Starter</h4>
+        <p class="text-4xl font-extrabold text-cyan-400">£5</p>
+        <p class="text-sm text-slate-400">500 credits</p>
+        <a href="/subscribe"
+           class="inline-block mt-4 px-6 py-3 rounded bg-brand text-black font-semibold hover:bg-brand-hover transition">
+          Buy Now
+        </a>
+      </div>
+
+      <!-- Pack 2 -->
+      <div class="bg-panel rounded-2xl p-8 shadow-lg space-y-4 border border-slate-700/50 text-center">
+        <h4 class="text-lg font-semibold">Creator</h4>
+        <p class="text-4xl font-extrabold text-cyan-400">£15</p>
+        <p class="text-sm text-slate-400">2,000 credits</p>
+        <a href="/subscribe"
+           class="inline-block mt-4 px-6 py-3 rounded bg-brand text-black font-semibold hover:bg-brand-hover transition">
+          Buy Now
+        </a>
+      </div>
+
+      <!-- Pack 3 -->
+      <div class="bg-panel rounded-2xl p-8 shadow-lg space-y-4 border border-slate-700/50 text-center">
+        <h4 class="text-lg font-semibold">Pro Studio</h4>
+        <p class="text-4xl font-extrabold text-cyan-400">£35</p>
+        <p class="text-sm text-slate-400">5,000 credits</p>
+        <a href="/subscribe"
+           class="inline-block mt-4 px-6 py-3 rounded bg-brand text-black font-semibold hover:bg-brand-hover transition">
+          Buy Now
+        </a>
+      </div>
+    </div>
+  </section>
+
+<!-- continue? -->
+  <!-- ╭───────────────────────────────────────────╮
+       │  UPGRADE CALL TO ACTION                  │
+       ╰───────────────────────────────────────────╯ -->
+  <section
+    class="bg-gradient-to-r from-cyan-500/10 via-blue-500/5 to-indigo-500/10
+           border-y border-slate-700/40 backdrop-blur"
+  >
+    <div
+      class="max-w-6xl mx-auto px-6 sm:px-8 py-16
+             flex flex-col md:flex-row items-center justify-between gap-10"
+    >
+      <div class="space-y-4">
+        <h3 class="text-2xl sm:text-3xl font-bold">
+          Unlock more AI power with monthly membership.
+        </h3>
+        <p class="text-slate-300 max-w-xl">
+          Get bonus credits every month, early access to features, and priority queues for video generation.
+        </p>
+      </div>
+
+      <a
+        href="/subscribe"
+        class="px-8 py-4 text-lg font-semibold rounded-lg shadow
+               bg-brand text-black hover:bg-brand-hover transition shrink-0"
+      >
+        Upgrade Now
+      </a>
+    </div>
+  </section>
+
+  <!-- ╭───────────────────────────────────────────╮
+       │  CREDITS FOOTER NAV                      │
+       ╰───────────────────────────────────────────╯ -->
+  <footer class="bg-[#171b25] border-t border-[#232732] text-sm text-slate-400">
+    <div
+      class="max-w-6xl mx-auto px-6 sm:px-8 py-10
+             flex flex-col sm:flex-row items-center justify-between gap-6"
+    >
+      <p>
+        © <span x-text="new Date().getFullYear()"></span> CreonAI • All rights reserved.
+      </p>
+
+      <nav class="flex gap-6 items-center">
+        <a href="/"        class="hover:text-brand-hover">Home</a>
+        <a href="/chat"    class="hover:text-brand-hover">Chat</a>
+        <a href="/credits" class="hover:text-brand-hover">Credits</a>
+        <a href="/terms"   class="hover:text-brand-hover">Terms</a>
+        <a href="/privacy" class="hover:text-brand-hover">Privacy</a>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- end-of-layout scripting next -->
+  <!-- ╭───────────────────────────────────────────╮
+       │  SCRIPTS & ALPINE HELPERS               │
+       ╰───────────────────────────────────────────╯ -->
+  <script>
+    document.addEventListener('alpine:init', () => {
+      // Global store for toast popups
+      Alpine.store('toast', {
+        list: [],
+        push(msg) {
+          this.list.push(msg);
+          setTimeout(() => this.list.shift(), 3000);
+        },
+      });
+    });
+
+    // Patch year (non-Alpine fallback)
+    document.addEventListener('DOMContentLoaded', () => {
+      const span = document.querySelector('footer span[x-text]');
+      if (span) span.textContent = new Date().getFullYear();
+    });
+  </script>
+
+  <!-- ╭───────────────────────────────────────────╮
+       │  TOAST NOTIFICATIONS                     │
+       ╰───────────────────────────────────────────╯ -->
+  <div
+    x-data
+    x-init="$watch('$store.toast.list', () => {})"
+    class="fixed bottom-6 right-6 space-y-2 z-50"
+  >
+    <template x-for="(msg, i) in $store.toast.list" :key="i">
+      <div
+        x-text="msg"
+        class="bg-brand text-[#0f172a] font-semibold px-4 py-2 rounded shadow-lg"
+      ></div>
+    </template>
+  </div>
+
+</body>
+</html>

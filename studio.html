@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en"
+      x-data="studioApp()"
+      x-init="initStudio()"
+      :class="{ dark: isDark }"
+      class="scroll-smooth antialiased font-inter">
+
+<!-- ─────────────────────── HEAD ─────────────────────── -->
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CreonAI • Studio</title>
+
+  <!-- Tailwind & Alpine -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <!-- Tailwind ↔ Creon palette -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { inter: ['Inter','system-ui','sans-serif'] },
+          colors : { accent:'#7C3AED', bgdark:'#0f172a', panel:'#1e293b' }
+        }
+      }
+    };
+  </script>
+
+  <!-- Quick inline style helpers -->
+  <style>
+    html.dark body { background:#0f172a; }
+    html:not(.dark) body { background:#f8fafc; }
+    .scrollbar::-webkit-scrollbar { width:8px }
+    .scrollbar::-webkit-scrollbar-thumb { background:#475569; border-radius:6px }
+  </style>
+</head>
+
+<!-- ─────────────────────── BODY ─────────────────────── -->
+<body :class="isDark ? 'text-slate-200' : 'text-slate-800'"
+      class="transition-colors duration-300">
+
+  <!-- ███ NAVBAR ﻿███ -->
+  <header class="sticky top-0 z-40 flex items-center justify-between
+                 backdrop-blur border-b border-slate-700/50
+                 bg-bgdark/80 px-6 h-14">
+    <a href="/" class="flex items-center gap-2 text-lg font-extrabold">
+      <svg class="h-6 w-6 text-accent" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M13 2 3 14h6v8l10-12h-6V2Z"/>
+      </svg>
+      <span>Creon<span class="text-accent">AI</span></span>
+    </a>
+
+    <nav class="hidden md:flex gap-8 text-sm">
+      <a href="/chat"     class="hover:text-accent">Chat</a>
+      <a href="/library"  class="hover:text-accent">Library</a>
+      <a href="/studio"   class="text-accent font-semibold">Studio</a>
+      <a href="/credits"  class="hover:text-accent">Credits</a>
+      <a href="/profile"  class="hover:text-accent">Profile</a>
+    </nav>
+
+    <!-- Theme toggle -->
+    <button @click="toggleTheme"
+            class="p-2 rounded hover:bg-white/5"
+            aria-label="Toggle theme">
+      <template x-if="isDark">
+        <svg class="h-5 w-5" fill="none" stroke="currentColor"
+             stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 3v1m0 16v1M4.22 4.22l.7.7M18.36 18.36l.7.7M1 12H3m18 0h2" />
+        </svg>
+      </template>
+      <template x-if="!isDark">
+        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M17.293 13.293a8 8 0 11-10.586-10.586 8 8 0 0010.586 10.586z"/>
+        </svg>
+      </template>
+    </button>
+  </header>
+
+  <!-- ███ WORKSPACE WRAPPER ███ -->
+  <main class="flex h-[calc(100vh-3.5rem)] overflow-hidden">
+
+    <!-- ░░ SIDE PANEL ░░ (Assets) -->
+    <aside class="w-72 shrink-0 border-r border-slate-700/60 bg-panel
+                  flex flex-col">
+      <header class="px-4 py-3 border-b border-slate-700/60 flex items-center">
+        <h2 class="text-sm font-semibold flex-1">Assets</h2>
+        <button @click="openUpload()" class="p-1.5 rounded hover:bg-white/10"
+                aria-label="Upload asset">
+          <svg class="h-5 w-5 text-accent" fill="none" stroke="currentColor"
+               stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M12 4v16m8-8H4" />
+          </svg>
+        </button>
+      </header>
+
+      <!-- Search -->
+      <div class="p-3">
+        <input type="text" x-model="assetSearch" placeholder="Search…"
+               class="w-full rounded bg-slate-800 border border-slate-600
+                      px-3 py-2 text-xs placeholder-slate-400 focus:ring-accent"/>
+      </div>
+
+      <!-- Asset list -->
+      <nav class="flex-1 overflow-y-auto scrollbar p-2 space-y-2">
+        <template x-for="asset in filteredAssets" :key="asset.id">
+          <button @click="selectAsset(asset)"
+                  class="w-full flex items-center gap-2 p-2 rounded
+                         hover:bg-white/10 transition"
+                  :class="{'bg-white/10 ring-1 ring-accent':
+                           selected && selected.id===asset.id}">
+            <img :src="asset.thumb" class="h-8 w-8 object-cover rounded"/>
+            <span class="truncate text-xs flex-1" x-text="asset.name"></span>
+            <span class="text-[10px] uppercase text-slate-500"
+                  x-text="asset.type"></span>
+          </button>
+        </template>
+        <p x-show="filteredAssets.length===0"
+           class="text-xs text-slate-500 text-center mt-10">No assets</p>
+      </nav>
+    </aside>
+
+    <!-- ░░ MAIN CANVAS ░░ -->
+    <section class="flex-1 flex flex-col bg-bgdark">
+
+      <!-- Toolbar -->
+      <div class="h-12 border-b border-slate-700/60 bg-panel
+                  flex items-center gap-4 px-4">
+        <button @click="play()"
+                class="flex items-center gap-1 text-xs px-3 py-1.5 rounded
+                       bg-accent text-black font-semibold hover:bg-accent/80">
+          ▶ Play
+        </button>
+        <button @click="exportProject()"
+                class="text-xs px-3 py-1.5 rounded border border-slate-600
+                       hover:bg-white/5">Export</button>
+        <div class="ml-auto flex items-center gap-3 text-xs">
+          <span class="text-slate-400">Zoom:</span>
+          <input type="range" min="25" max="400" step="25"
+                 x-model.number="zoom"
+                 class="accent-accent"/>
+          <span x-text="zoom+'%'"></span>
+        </div>
+      </div>
+
+      <!-- Canvas / preview placeholder -->
+      <div class="flex-1 flex items-center justify-center bg-slate-900
+                  relative">
+        <template x-if="selected">
+          <!-- Show selected asset preview -->
+          <img x-show="selected.type==='image'" :src="selected.src"
+               class="max-h-full max-w-full object-contain"/>
+          <video x-show="selected.type==='video'" controls :src="selected.src"
+                 class="max-h-full max-w-full rounded"></video>
+        </template>
+
+        <p x-show="!selected"
+           class="text-slate-600 text-sm select-none">Select an asset to preview</p>
+      </div>
+
+      <!-- Timeline -->
+      <footer class="h-40 bg-panel border-t border-slate-700/60">
+        <header class="h-8 flex items-center gap-3 px-4 text-xs border-b
+                       border-slate-700/60">
+          <span class="uppercase tracking-wide text-slate-400">Timeline</span>
+          <div class="ml-auto flex gap-2">
+            <button @click="addTrack()" class="hover:text-accent">+ Track</button>
+            <button @click="toggleSnap()" class="hover:text-accent"
+                    x-text="snap?'Snap':'Free'"></button>
+          </div>
+        </header>
+
+        <div id="timelineScroller"
+             class="h-[7.5rem] overflow-x-auto scrollbar relative">
+
+          <!-- grid background -->
+          <div class="absolute inset-0 pointer-events-none"
+               :style="`background-size:${grid}px 100%;
+                        background-image:linear-gradient(to right,
+                                        rgba(148,163,184,0.08) 1px,
+                                        transparent 1px);`"></div>
+
+          <!-- Track list -->
+          <div class="relative min-h-full"
+               :style="`width:${timelineLength*zoomFactor}px`">
+            <template x-for="track in tracks" :key="track.id">
+              <div class="h-10 my-1 relative">
+                <!-- clip rectangles -->
+                <template x-for="clip in track.clips" :key="clip.id">
+                  <div class="absolute h-full rounded bg-accent/60 hover:bg-accent
+                              cursor-pointer"
+                       :style="clipStyle(clip)"></div>
+                </template>
+              </div>
+            </template>
+          </div>
+        </div>
+      </footer>
+    </section>
+  </main>
+
+  <!-- Upload modal (inline stub) -->
+  <div x-show="uploadOpen" x-transition x-cloak
+       class="fixed inset-0 bg-black/70 flex items-center justify-center
+              p-6 z-50">
+    <div class="bg-panel rounded-xl border border-slate-600 p-6 w-full max-w-sm">
+      <h3 class="text-base font-semibold mb-4">Upload Asset</h3>
+      <input type="file" @change="handleUpload($event)" class="mb-6"/>
+      <div class="flex justify-end gap-4">
+        <button @click="uploadOpen=false"
+                class="text-sm px-4 py-1.5 rounded hover:bg-white/5">Cancel</button>
+        <button :disabled="!fileToUpload"
+                @click="submitUpload()"
+                class="px-4 py-1.5 rounded bg-accent text-black text-sm
+                       font-semibold hover:bg-accent/80 disabled:opacity-40">
+          Upload
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alpine Component -->
+  <script>
+    function studioApp () {
+      return {
+        /* theme */
+        isDark : localStorage.theme === 'dark',
+        toggleTheme () {
+          this.isDark = !this.isDark;
+          localStorage.theme = this.isDark ? 'dark' : 'light';
+          document.documentElement.classList.toggle('dark', this.isDark);
+        },
+
+        /* assets */
+        assets        : [],
+        filteredAssets: [],
+        assetSearch   : '',
+        selected      : null,
+
+        /* timeline */
+        tracks  : [],
+        zoom    : 100,
+        snap    : true,
+        grid    : 50,
+        timelineLength : 60,            // seconds
+        get zoomFactor () { return this.zoom / 100; },
+
+        /* upload modal */
+        uploadOpen   : false,
+        fileToUpload : null,
+
+        /* ───────── Init ───────── */
+        initStudio () {
+          this.fetchAssets();
+          this.fetchProject();
+          this.$watch('assetSearch', () => this.searchAssets());
+        },
+
+        /* ───────── Assets ───────── */
+        fetchAssets () {
+          fetch('/api/studio/assets').then(r => r.json())
+            .then(j => { this.assets = j; this.filteredAssets = j; });
+        },
+        searchAssets () {
+          const n = this.assetSearch.toLowerCase();
+          this.filteredAssets = this.assets.filter(a =>
+            a.name.toLowerCase().includes(n));
+        },
+        selectAsset (a) { this.selected = a; },
+
+        openUpload () { this.uploadOpen = true; },
+        handleUpload (e) { this.fileToUpload = e.target.files[0]; },
+        submitUpload () {
+          const data = new FormData();
+          data.append('file', this.fileToUpload);
+          fetch('/api/studio/upload', { method:'POST', body:data })
+            .then(r=>r.json()).then(a=>{
+              this.assets.push(a);
+              this.filteredAssets.push(a);
+              this.uploadOpen=false; this.fileToUpload=null;
+            });
+        },
+
+        /* ───────── Timeline ───────── */
+        fetchProject () {
+          fetch('/api/studio/project').then(r=>r.json())
+            .then(p => { this.tracks = p.tracks; });
+        },
+        addTrack () {
+          const id = crypto.randomUUID();
+          this.tracks.push({ id, clips:[] });
+        },
+        clipStyle (c) {
+          return `
+            left:${c.start*this.zoomFactor}px;
+            width:${c.duration*this.zoomFactor}px;
+          `;
+        },
+        toggleSnap () { this.snap = !this.snap; },
+
+        /* stub actions */
+        play () { console.log('▶ play preview'); },
+        exportProject () {
+          fetch('/api/studio/export', { method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({ tracks:this.tracks }) })
+          .then(()=>alert('Render job queued (stub)'));
+        }
+      }
+    }
+  </script>
+</body>
+</html>

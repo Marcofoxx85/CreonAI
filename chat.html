@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<!-- Alpine.js attaches to this root element -->
+<html x-data="chatApp()" x-init="initApp()" :class="theme + ' scroll-smooth antialiased font-inter'">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0f172a" />
+
+  <title>CreonAI • Chat</title>
+
+  <!-- ✦ FONTS ✦ -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet" />
+
+  <!-- ✦ UUID polyfill for older browsers that lack crypto.randomUUID() ✦ -->
+  <script>
+    if (!('randomUUID' in crypto)) {
+      crypto.randomUUID = () =>
+        ([1e7] + -1e3 + -4e3 + -8e3 + -1e11)
+          .replace(/[018]/g, c =>
+            (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+          );
+    }
+  </script>
+
+  <!-- ✦ TAILWIND CONFIG ✦ -->
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: { inter: ['Inter', 'system-ui', 'sans-serif'] },
+          fontSize  : { base: ['17px', '1.7rem'] },
+          colors    : { accent:'#7C3AED', bgdark:'#0f172a', panel:'#1e293b' }
+        }
+      }
+    };
+  </script>
+  <script src="https://cdn.tailwindcss.com?plugins=typography"></script>
+
+  <!-- ✦ LIBRARIES ✦ -->
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/github-dark.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/highlight.min.js"></script>
+
+  <!-- ✦ MINOR GLOBAL STYLES ✦ -->
+  <style>
+    [x-cloak]{display:none!important;}
+    .prose{max-width:none;}
+    .icon-btn{padding:.4rem;border-radius:.375rem;}
+    html.dark body{background:#0f172a;}
+    html:not(.dark) body{background:#f8fafc;}
+    ::-webkit-scrollbar{width:10px;}
+    ::-webkit-scrollbar-thumb{background:#334155;border-radius:6px;}
+    ::-webkit-scrollbar-thumb:hover{background:#475569;}
+  </style>
+</head>
+
+
+<body class="text-slate-200 selection:bg-accent/50">
+    <!-- ✦ NAVIGATION BAR ✦ -->
+    <nav class="sticky top-0 z-50 flex items-center justify-between bg-bgdark border-b border-slate-700/50 px-4 py-3 shadow">
+      <!-- ░ BRAND ░ -->
+      <div class="flex items-center gap-2">
+        <svg class="h-6 w-6 text-accent" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M13 2 3 14h6v8l10-12h-6V2Z" />
+        </svg>
+        <span class="text-lg font-extrabold tracking-tight">CreonAI</span>
+      </div>
+
+      <!-- ░ DESKTOP NAV LINKS ░ -->
+      <ul class="hidden md:flex items-center gap-6 text-sm">
+        <li><a href="/" class="hover:text-accent transition">Home</a></li>
+        <li><a href="/chat" class="text-accent font-semibold">Chat</a></li>
+        <li><a href="/library" class="hover:text-accent">Library</a></li>
+        <li><a href="/credits" class="hover:text-accent">Credits</a></li>
+        <li><a href="/subscribe" class="hover:text-accent">Subscribe</a></li>
+        <li><a href="/why-us" class="hover:text-accent">Why Us</a></li>
+        <li><a href="/profile" class="hover:text-accent">Profile</a></li>
+      </ul>
+
+      <!-- ░ RIGHT CONTROLS ░ -->
+      <div class="flex items-center gap-4">
+        <!-- Theme Toggle -->
+        <button @click="toggleTheme" class="text-slate-400 hover:text-accent transition" aria-label="Toggle theme">
+          <svg x-show="theme === 'dark'" class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1M4.22 4.22l.7.7M18.36 18.36l.7.7M1 12H3m18 0h2m-2.36-6.36l-.7.7M6.34 17.66l-.7.7"/>
+          </svg>
+          <svg x-show="theme !== 'dark'" class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M17.293 13.293a8 8 0 11-10.586-10.586A8 8 0 0017.293 13.293z"/>
+          </svg>
+        </button>
+
+        <!-- Avatar Dropdown -->
+        <div class="relative" x-data="{ open: false }">
+          <button @click="open = !open" class="h-8 w-8 overflow-hidden rounded-full ring-1 ring-accent/50" aria-label="User menu">
+            <img :src="user.avatar" alt="Avatar" class="h-full w-full object-cover" />
+          </button>
+          <ul
+            x-show="open"
+            @click.outside="open = false"
+            x-transition
+            class="absolute right-0 mt-2 w-40 bg-panel border border-slate-700 rounded shadow-lg py-1 text-sm z-50"
+          >
+            <li><a href="/profile" class="block px-3 py-2 hover:bg-white/5">Profile</a></li>
+            <li><a href="/settings" class="block px-3 py-2 hover:bg-white/5">Settings</a></li>
+            <li>
+              <button @click="signOut" class="w-full text-left px-3 py-2 text-red-400 hover:bg-red-500/10">Sign out</button>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- ✦ WRAPPER START ✦ -->
+   <div class="flex min-h-screen bg-bgdark">
+
+     <!-- ✦ SIDEBAR ✦ -->
+<aside
+  id="sidebar"
+  class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col bg-panel/95 border-r border-slate-700/60 backdrop-blur-lg shadow-xl transition-transform duration-300 md:static"
+  :class="{ '-translate-x-full md:translate-x-0': !sidebarOpen }"
+  role="complementary"
+  aria-label="Chat history sidebar"
+      >
+        <!-- ░ HEADER ░ -->
+        <header class="flex items-center justify-between px-4 py-4 border-b border-slate-700/50">
+          <h2 class="text-sm font-semibold text-slate-300">Chats</h2>
+          <button
+            @click="sidebarOpen = false"
+            class="p-1 rounded hover:bg-white/5"
+            aria-label="Close sidebar"
+          >
+            <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </header>
+
+        <!-- ░ ACTIONS ░ -->
+        <div class="px-4 pt-3 pb-2 space-y-3">
+         <!-- ✦ Theme Toggle ✦ -->
+<button
+  @click="toggleTheme"
+  class="flex items-center gap-2 text-xs font-medium px-2 py-1 rounded transition text-slate-400 hover:text-accent hover:bg-white/5 focus:outline-none focus:ring-1 focus:ring-accent"
+  aria-label="Toggle dark/light theme"
+  :title="theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'"
+>
+  <!-- Moon Icon -->
+  <svg
+    x-show="theme === 'dark'"
+    x-cloak
+    class="h-4 w-4"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    viewBox="0 0 24 24"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      d="M21 12.79A9 9 0 1111.21 3a7 7 0 0010.08 9.79z"
+    />
+  </svg>
+
+  <!-- Sun Icon -->
+  <svg
+    x-show="theme !== 'dark'"
+    x-cloak
+    class="h-4 w-4"
+    fill="currentColor"
+    viewBox="0 0 20 20"
+  >
+    <path
+      d="M10 2a.75.75 0 01.75.75v.5a.75.75 0 01-1.5 0v-.5A.75.75 0 0110 2zm0 14.5a.75.75 0 01.75.75v.5a.75.75 0 01-1.5 0v-.5a.75.75 0 01.75-.75zM4.22 4.22a.75.75 0 011.06 0l.35.35a.75.75 0 01-1.06 1.06l-.35-.35a.75.75 0 010-1.06zm10.19 10.19a.75.75 0 011.06 0l.35.35a.75.75 0 11-1.06 1.06l-.35-.35a.75.75 0 010-1.06zM2 10a.75.75 0 01.75-.75h.5a.75.75 0 010 1.5h-.5A.75.75 0 012 10zm14.5 0a.75.75 0 01.75-.75h.5a.75.75 0 010 1.5h-.5a.75.75 0 01-.75-.75zM4.22 15.78a.75.75 0 000-1.06l.35-.35a.75.75 0 011.06 1.06l-.35.35a.75.75 0 01-1.06 0zm10.19-10.19a.75.75 0 000-1.06l.35-.35a.75.75 0 011.06 1.06l-.35.35a.75.75 0 01-1.06 0zM10 6a4 4 0 100 8 4 4 0 000-8z"
+    />
+  </svg>
+
+  <!-- Label -->
+  <span x-text="theme === 'dark' ? 'Dark Mode' : 'Light Mode'"></span>
+</button>
+
+          <!-- Chat search -->
+          <input
+            type="text"
+            x-model="chatFilter"
+            @input="filterChats(chatFilter)"
+            placeholder="Search chats…"
+            class="w-full rounded bg-slate-700 border border-slate-600 px-3 py-2 text-sm placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-accent"
+          />
+
+          <!-- New chat button -->
+          <button
+            @click="newChat()"
+            class="w-full bg-accent text-black text-sm font-semibold py-2 rounded hover:bg-accent/80 active:bg-accent/60 transition"
+          >
+            + New Chat
+          </button>
+        </div>
+
+     <!-- ░ CHAT LIST ░ -->
+<nav class="flex-1 overflow-y-auto px-2 space-y-1" aria-label="Chat list">
+  <template x-for="chat in filteredChats" :key="chat.id">
+    <button
+      @click="openChat(chat.id)"
+      class="group flex w-full items-center gap-2 px-3 py-2 rounded-md text-sm text-left transition-all duration-150 ease-in-out hover:bg-white/5 hover:scale-[1.015]"
+      :class="{ 'bg-white/10 text-accent font-semibold shadow-inner': chat.id === activeChatId }"
+      :title="chat.title"
+    >
+      <!-- Icon -->
+      <svg
+        class="h-3.5 w-3.5 flex-shrink-0 text-accent"
+        fill="currentColor"
+        viewBox="0 0 20 20"
+      >
+        <circle cx="10" cy="10" r="4" />
+      </svg>
+
+      <!-- Title -->
+      <span class="truncate flex-1" x-text="chat.title"></span>
+
+      <!-- Optional: Action buttons (future) -->
+      <!--
+      <div class="hidden group-hover:flex gap-1 text-slate-500">
+        <button @click.stop="editChat(chat)" title="Edit" class="hover:text-accent">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536M9 11l6-6 3 3-6 6H9v-3z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18" />
+          </svg>
+        </button>
+        <button @click.stop="deleteChat(chat.id)" title="Delete" class="hover:text-red-500">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      -->
+    </button>
+  </template>
+
+  <!-- Empty state -->
+  <template x-if="filteredChats.length === 0">
+    <p class="px-3 py-4 text-xs text-slate-500 italic">No chats found.</p>
+  </template>
+</nav>
+
+
+        <!-- ░ FOOTER ░ -->
+        <footer class="border-t border-slate-700/50 px-4 py-3 text-[10px] text-slate-500">
+          v1.0 • CreonAI
+        </footer>
+      </aside>
+      <!-- ✦ MAIN COLUMN ✦ -->
+      <main class="flex-1 flex flex-col bg-bgdark">
+
+       
+    <!-- █████ TAB STRIP █████ -->
+    <div class="flex items-center gap-1 px-4 py-2 border-b border-slate-700/50 bg-panel">
+      <template x-for="tab in tabs" :key="tab.id">
+        <button @click="activeTab = tab.id"
+                x-text="tab.label"
+                class="uppercase text-xs font-semibold tracking-wide px-3 py-1.5 rounded transition"
+                :class="activeTab===tab.id ? 'bg-white/10 text-accent' : 'hover:bg-white/5 text-slate-400'"></button>
+      </template>
+      <div class="ml-auto md:hidden">
+        <button @click="sidebarOpen = !sidebarOpen" class="p-1 rounded hover:bg-white/5" aria-label="Toggle sidebar">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2"
+               viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round"
+               d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+      </div>
+    </div>
+
+<!-- ✦ GPT-4o SETTINGS ✦ -->
+<section
+	x-cloak x-show="activeTab === 'gpt4o'"
+  x-transition
+  class="px-4 py-6 border-b border-slate-700/50 bg-slate-900/70 backdrop-blur-sm space-y-6"
+>
+  <div class="flex items-center justify-between">
+    <h3 class="text-sm font-bold text-slate-300 tracking-wide uppercase">GPT-4o Settings</h3>
+    <!-- Toggle -->
+    <div class="flex items-center gap-2 text-xs text-slate-400">
+      <span>Pro Mode</span>
+      <button
+        @click="settings.gpt4oPro = !settings.gpt4oPro"
+        :aria-pressed="settings.gpt4oPro"
+        class="w-10 h-5 flex items-center rounded-full transition-colors duration-200"
+        :class="settings.gpt4oPro ? 'bg-accent' : 'bg-slate-600'"
+      >
+        <span
+          class="h-4 w-4 transform bg-white rounded-full shadow transition-transform duration-200"
+          :class="settings.gpt4oPro ? 'translate-x-5' : 'translate-x-1'"
+        ></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ADVANCED SETTINGS -->
+  <template x-if="settings.gpt4oPro">
+    <div class="space-y-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Temperature -->
+        <div class="space-y-1">
+          <label class="text-xs text-slate-400">Temperature</label>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.1"
+            x-model.number="settings.temperature"
+            class="w-full accent-accent"
+          />
+        </div>
+
+        <!-- Max Tokens -->
+        <div class="space-y-1">
+          <label class="text-xs text-slate-400">Max Tokens</label>
+          <input
+            type="number"
+            x-model.number="settings.maxTokens"
+            class="w-full px-3 py-2 rounded bg-slate-800 text-sm border border-slate-600 text-white"
+            placeholder="e.g. 800"
+          />
+        </div>
+
+        <!-- Persona -->
+        <div class="space-y-1">
+          <label class="text-xs text-slate-400">Persona</label>
+          <select
+            x-model="settings.persona"
+            class="w-full px-3 py-2 rounded bg-slate-800 text-sm border border-slate-600 text-white"
+          >
+            <option value="default">🧑 Default</option>
+            <option value="sass">💅 Sassy</option>
+            <option value="coach">💪 Coach</option>
+            <option value="nerd">🧠 Nerdy</option>
+          </select>
+        </div>
+
+        <!-- Top-P -->
+        <div class="space-y-1">
+          <label class="text-xs text-slate-400">Top-P</label>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            x-model.number="settings.top_p"
+            class="w-full accent-accent"
+          />
+        </div>
+
+        <!-- Frequency Penalty -->
+        <div class="space-y-1">
+          <label class="text-xs text-slate-400">Frequency Penalty</label>
+          <input
+            type="range"
+            min="0"
+            max="2"
+            step="0.1"
+            x-model.number="settings.frequency_penalty"
+            class="w-full accent-accent"
+          />
+        </div>
+
+        <!-- Presence Penalty -->
+        <div class="space-y-1">
+          <label class="text-xs text-slate-400">Presence Penalty</label>
+          <input
+            type="range"
+            min="0"
+            max="2"
+            step="0.1"
+            x-model.number="settings.presence_penalty"
+            class="w-full accent-accent"
+          />
+        </div>
+      </div>
+
+      <!-- System Prompt -->
+      <div class="space-y-1">
+        <label class="text-xs text-slate-400">System Prompt</label>
+        <textarea
+          x-model="settings.systemPrompt"
+          rows="3"
+          class="w-full px-3 py-2 rounded bg-slate-800 text-sm border border-slate-600 text-white"
+          placeholder="e.g. 'You are a wise mentor.'"
+        ></textarea>
+      </div>
+    </div>
+  </template>
+</section>
+
+       <!-- ✦ GEMINI SETTINGS ✦ -->
+
+ <section x-cloak x-show="activeTab === 'gemini'"
+  x-transition
+  class="px-4 py-6 border-b border-slate-700/50 bg-slate-900/70 backdrop-blur-sm space-y-6"
+>
+  <div class="flex items-center justify-between">
+    <h3 class="text-sm font-bold text-slate-300 tracking-wide uppercase">Gemini Settings</h3>
+    <!-- Toggle -->
+    <div class="flex items-center gap-2 text-xs text-slate-400">
+      <span>Pro Mode</span>
+      <button
+        @click="settings.geminiPro = !settings.geminiPro"
+        :aria-pressed="settings.geminiPro"
+        class="w-10 h-5 flex items-center rounded-full transition-colors duration-200"
+        :class="settings.geminiPro ? 'bg-accent' : 'bg-slate-600'"
+      >
+        <span
+          class="h-4 w-4 transform bg-white rounded-full shadow transition-transform duration-200"
+          :class="settings.geminiPro ? 'translate-x-5' : 'translate-x-1'"
+        ></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ADVANCED SETTINGS -->
+  <template x-if="settings.geminiPro">
+    <div class="space-y-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        <!-- Model -->
+        <div class="space-y-1">
+          <label class="text-xs text-slate-400">Model</label>
+          <select
+            x-model="settings.geminiModel"
+            class="w-full px-3 py-2 rounded bg-slate-800 border border-slate-600 text-sm text-white"
+          >
+            <option value="gemini-pro">Gemini Pro</option>
+            <option value="gemini-1.5">Gemini 1.5 Flash</option>
+          </select>
+        </div>
+
+        <!-- Temperature -->
+        <div class="space-y-1">
+          <label class="text-xs text-slate-400">Temperature</label>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.1"
+            x-model.number="settings.geminiTemp"
+            class="w-full accent-accent"
+          />
+        </div>
+
+        <!-- Max Tokens -->
+        <div class="space-y-1">
+          <label class="text-xs text-slate-400">Max Tokens</label>
+          <input
+            type="number"
+            x-model.number="settings.geminiTokens"
+            class="w-full px-3 py-2 rounded bg-slate-800 border border-slate-600 text-sm text-white"
+            placeholder="e.g. 1000"
+          />
+        </div>
+
+        <!-- Web Access -->
+        <div class="space-y-1">
+          <label class="text-xs text-slate-400">Web Access</label>
+          <select
+            x-model="settings.geminiWeb"
+            class="w-full px-3 py-2 rounded bg-slate-800 border border-slate-600 text-sm text-white"
+          >
+            <option :value="true">Enabled</option>
+            <option :value="false">Disabled</option>
+          </select>
+        </div>
+
+        <!-- Safe Content Filter -->
+        <div class="space-y-1">
+          <label class="text-xs text-slate-400">Safe Content Filter</label>
+          <select
+            x-model="settings.geminiSafe"
+            class="w-full px-3 py-2 rounded bg-slate-800 border border-slate-600 text-sm text-white"
+          >
+            <option :value="true">Strict</option>
+            <option :value="false">Off</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- System Prompt -->
+      <div class="space-y-1">
+        <label class="text-xs text-slate-400">System Prompt</label>
+        <textarea
+          x-model="settings.geminiSystem"
+          rows="3"
+          class="w-full px-3 py-2 rounded bg-slate-800 border border-slate-600 text-sm text-white"
+          placeholder="e.g. 'You are a creative co-pilot.'"
+        ></textarea>
+      </div>
+    </div>
+  </template>
+</section>
+
+<!-- ✦ AUDIO / TTS SETTINGS (added) ✦ -->
+    <section x-cloak x-show="activeTab === 'image'"
+             class="px-4 py-6 border-b border-slate-700/50 bg-slate-900/70 backdrop-blur-sm space-y-6">
+      <div class="flex items-center justify-between">
+        <h3 class="text-sm font-bold text-slate-300 uppercase tracking-wide">TTS Settings</h3>
+        <div class="flex items-center gap-2 text-xs text-slate-400">
+          <span>Pro Mode</span>
+          <button @click="settings.audioPro = !settings.audioPro"
+                  class="w-10 h-5 flex items-center rounded-full transition-colors"
+                  :class="settings.audioPro?'bg-accent':'bg-slate-600'">
+            <span class="h-4 w-4 bg-white rounded-full shadow transition-transform"
+                  :class="settings.audioPro?'translate-x-5':'translate-x-1'"></span>
+          </button>
+        </div>
+      </div>
+      <template x-if="settings.audioPro">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <!-- Voice -->
+          <div class="space-y-1"><label class="text-xs text-slate-400">Voice</label>
+            <select x-model="settings.ttsVoice"
+                    class="w-full bg-slate-800 px-3 py-2 rounded border border-slate-600 text-sm text-white">
+              <option value="nova">Nova (default)</option><option value="alloy">Alloy</option>
+              <option value="robot">Robot</option><option value="whisper">Whisper</option></select></div>
+          <!-- Speed -->
+          <div class="space-y-1"><label class="text-xs text-slate-400">Speed</label>
+            <input type="range" min="0.5" max="2" step="0.05" x-model.number="settings.ttsSpeed"
+                   class="w-full accent-accent"/></div>
+          <!-- Pitch -->
+          <div class="space-y-1"><label class="text-xs text-slate-400">Pitch</label>
+            <input type="range" min="-12" max="12" step="1" x-model.number="settings.ttsPitch"
+                   class="w-full accent-accent"/></div>
+          <!-- Emotion -->
+          <div class="space-y-1"><label class="text-xs text-slate-400">Emotion</label>
+            <select x-model="settings.ttsEmotion"
+                    class="w-full bg-slate-800 px-3 py-2 rounded border border-slate-600 text-sm text-white">
+              <option value="neutral">Neutral</option><option value="happy">Happy</option>
+              <option value="sad">Sad</option><option value="angry">Angry</option></select></div>
+          <!-- Language -->
+          <div class="space-y-1"><label class="text-xs text-slate-400">Language</label>
+            <select x-model="settings.ttsLang"
+                    class="w-full bg-slate-800 px-3 py-2 rounded border border-slate-600 text-sm text-white">
+              <option value="en">English</option><option value="es">Spanish</option>
+              <option value="fr">French</option><option value="ja">Japanese</option></select></div>
+        </div>
+      </template>
+    </section>
+
+        <!-- ✦ IMAGE SETTINGS ✦ -->
+
+ 	<section x-cloak x-show="activeTab === 'video'"
+  x-transition
+  class="px-4 py-6 border-b border-slate-700/50 bg-slate-900/70 backdrop-blur-sm space-y-6"
+>
+  <div class="flex items-center justify-between">
+    <h3 class="text-sm font-bold text-slate-300 tracking-wide uppercase">DALL·E 3 Settings</h3>
+    <!-- Toggle -->
+    <div class="flex items-center gap-2 text-xs text-slate-400">
+      <span>Pro Mode</span>
+      <button
+        @click="settings.imagePro = !settings.imagePro"
+        :aria-pressed="settings.imagePro"
+        class="w-10 h-5 flex items-center rounded-full transition-colors duration-200"
+        :class="settings.imagePro ? 'bg-accent' : 'bg-slate-600'"
+      >
+        <span
+          class="h-4 w-4 transform bg-white rounded-full shadow transition-transform duration-200"
+          :class="settings.imagePro ? 'translate-x-5' : 'translate-x-1'"
+        ></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ADVANCED SETTINGS -->
+  <template x-if="settings.imagePro">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <!-- Resolution -->
+      <div class="space-y-1">
+        <label class="text-xs text-slate-400">Resolution</label>
+        <select
+          x-model="settings.dalleRes"
+          class="w-full bg-slate-800 px-3 py-2 text-sm rounded border border-slate-600 focus:ring-accent"
+        >
+          <option value="1024x1024">Square (1024x1024)</option>
+          <option value="1792x1024">Landscape (1792x1024)</option>
+          <option value="1024x1792">Portrait (1024x1792)</option>
+          <option value="2048x2048">High Res Square</option>
+          <option value="2048x1024">Ultra-Wide</option>
+        </select>
+      </div>
+
+      <!-- Style -->
+      <div class="space-y-1">
+        <label class="text-xs text-slate-400">Style</label>
+        <select
+          x-model="settings.dalleStyle"
+          class="w-full bg-slate-800 px-3 py-2 text-sm rounded border border-slate-600 focus:ring-accent"
+        >
+          <option value="vivid">Vivid</option>
+          <option value="natural">Natural</option>
+          <option value="anime">Anime</option>
+          <option value="photorealistic">Photorealistic</option>
+          <option value="sketch">Sketch</option>
+        </select>
+      </div>
+
+      <!-- Output Format -->
+      <div class="space-y-1">
+        <label class="text-xs text-slate-400">Format</label>
+        <select
+          x-model="settings.dalleFormat"
+          class="w-full bg-slate-800 px-3 py-2 text-sm rounded border border-slate-600 focus:ring-accent"
+        >
+          <option value="png">PNG</option>
+          <option value="jpeg">JPEG</option>
+          <option value="webp">WEBP</option>
+        </select>
+      </div>
+
+      <!-- Quality -->
+      <div class="space-y-1">
+        <label class="text-xs text-slate-400">Render Quality</label>
+        <select
+          x-model="settings.dalleQuality"
+          class="w-full bg-slate-800 px-3 py-2 text-sm rounded border border-slate-600 focus:ring-accent"
+        >
+          <option value="standard">Standard</option>
+          <option value="hd">High Definition</option>
+          <option value="draft">Faster (Draft)</option>
+        </select>
+      </div>
+
+      <!-- Number of Outputs -->
+      <div class="space-y-1">
+        <label class="text-xs text-slate-400">Image Count</label>
+        <select
+          x-model.number="settings.dalleCount"
+          class="w-full bg-slate-800 px-3 py-2 text-sm rounded border border-slate-600 focus:ring-accent"
+        >
+          <option value="1">1 Image</option>
+          <option value="2">2 Images</option>
+          <option value="3">3 Images</option>
+          <option value="4">4 Images</option>
+        </select>
+      </div>
+    </div>
+  </template>
+</section>
+
+       <!-- ✦ VIDEO SETTINGS ✦ -->
+<section
+  x-show="activeTab === 'video'"
+  x-transition
+  class="px-4 py-6 border-b border-slate-700/50 bg-slate-900/70 backdrop-blur-sm space-y-6"
+>
+  <div class="flex items-center justify-between">
+    <h3 class="text-sm font-bold text-slate-300 tracking-wide uppercase">Veo 3 Settings</h3>
+    <!-- Toggle -->
+    <div class="flex items-center gap-2 text-xs text-slate-400">
+      <span>Pro Mode</span>
+      <button
+        @click="settings.videoPro = !settings.videoPro"
+        :aria-pressed="settings.videoPro"
+        class="w-10 h-5 flex items-center rounded-full transition-colors duration-200"
+        :class="settings.videoPro ? 'bg-accent' : 'bg-slate-600'"
+      >
+        <span
+          class="h-4 w-4 transform bg-white rounded-full shadow transition-transform duration-200"
+          :class="settings.videoPro ? 'translate-x-5' : 'translate-x-1'"
+        ></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ADVANCED SETTINGS -->
+  <template x-if="settings.videoPro">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+      <!-- Quality -->
+      <div class="space-y-1">
+        <label class="text-xs text-slate-400">Resolution</label>
+        <select
+          x-model="settings.veoQuality"
+          class="w-full px-3 py-2 rounded bg-slate-800 text-sm border border-slate-600 text-white focus:ring-accent"
+        >
+          <option value="1080p">1080p</option>
+          <option value="720p">720p</option>
+          <option value="4k">4K</option>
+        </select>
+      </div>
+
+      <!-- Duration -->
+      <div class="space-y-1">
+        <label class="text-xs text-slate-400">Duration</label>
+        <select
+          x-model="settings.veoDuration"
+          class="w-full px-3 py-2 rounded bg-slate-800 text-sm border border-slate-600 text-white focus:ring-accent"
+        >
+          <option value="4">4 sec</option>
+          <option value="6">6 sec</option>
+          <option value="8">8 sec</option>
+          <option value="10">10 sec</option>
+          <option value="15">15 sec</option>
+        </select>
+      </div>
+
+      <!-- Framerate -->
+      <div class="space-y-1">
+        <label class="text-xs text-slate-400">Framerate</label>
+        <select
+          x-model="settings.veoFramerate"
+          class="w-full px-3 py-2 rounded bg-slate-800 text-sm border border-slate-600 text-white focus:ring-accent"
+        >
+          <option value="24">24 fps (cinematic)</option>
+          <option value="30">30 fps</option>
+          <option value="60">60 fps</option>
+        </select>
+      </div>
+
+      <!-- Aspect Ratio -->
+      <div class="space-y-1">
+        <label class="text-xs text-slate-400">Aspect Ratio</label>
+        <select
+          x-model="settings.veoAspect"
+          class="w-full px-3 py-2 rounded bg-slate-800 text-sm border border-slate-600 text-white focus:ring-accent"
+        >
+          <option value="16:9">16:9 (Landscape)</option>
+          <option value="9:16">9:16 (Portrait)</option>
+          <option value="1:1">1:1 (Square)</option>
+          <option value="2.39:1">Cinematic Scope</option>
+        </select>
+      </div>
+
+      <!-- Style -->
+      <div class="space-y-1">
+        <label class="text-xs text-slate-400">Style</label>
+        <select
+          x-model="settings.veoStyle"
+          class="w-full px-3 py-2 rounded bg-slate-800 text-sm border border-slate-600 text-white focus:ring-accent"
+        >
+          <option value="cinematic">🎬 Cinematic</option>
+          <option value="vaporwave">🌈 Vaporwave</option>
+          <option value="documentary">📽️ Documentary</option>
+          <option value="surreal">🌀 Surreal</option>
+          <option value="nature">🌿 Nature</option>
+        </select>
+      </div>
+
+      <!-- Transition Style -->
+      <div class="space-y-1">
+        <label class="text-xs text-slate-400">Transition</label>
+        <select
+          x-model="settings.veoTransition"
+          class="w-full px-3 py-2 rounded bg-slate-800 text-sm border border-slate-600 text-white focus:ring-accent"
+        >
+          <option value="none">None</option>
+          <option value="fade">Fade</option>
+          <option value="cut">Cut</option>
+          <option value="slide">Slide</option>
+          <option value="glitch">Glitch</option>
+        </select>
+      </div>
+
+      <!-- Model Version -->
+      <div class="space-y-1">
+        <label class="text-xs text-slate-400">Model</label>
+        <select
+          x-model="settings.veoModel"
+          class="w-full px-3 py-2 rounded bg-slate-800 text-sm border border-slate-600 text-white focus:ring-accent"
+        >
+          <option value="veo-v1">Veo 1</option>
+          <option value="veo-v2">Veo 2</option>
+          <option value="veo-v3">Veo 3</option>
+        </select>
+      </div>
+
+    </div>
+  </template>
+</section>
+
+<section id="chatScroll"
+         class="flex-1 w-full max-w-3xl mx-auto overflow-y-auto px-4 py-8 pb-48
+                space-y-8 scroll-smooth">
+
+
+  <!-- one message -->
+  <template x-for="msg in messages" :key="msg.id">
+    <div  class="relative flex gap-4"
+          :class="msg.role === 'user' ? 'flex-row-reverse' : ''">
+
+      <!-- avatar -->
+      <img  :src="msg.role === 'user' ? user.avatar : bot.avatar"
+            class="w-9 h-9 rounded-full object-cover shrink-0" />
+
+      <!-- message bubble -->
+      <div :class="[
+              'rounded-3xl px-5 py-3 leading-7 max-w-[calc(100%-6rem)] shadow prose dark:prose-invert',
+              msg.role === 'user'
+                ? (theme === 'dark'
+                    ? 'bg-slate-700 text-slate-100'  // user – dark mode
+                    : 'bg-slate-200 text-slate-800') // user – light mode
+                : (theme === 'dark'
+                    ? 'bg-[#444654] text-slate-100'  // assistant – dark mode
+                    : 'bg-slate-100 text-slate-800') // assistant – light mode
+            ]">
+
+        <!-- typing cursor -->
+        <template x-if="msg.role==='assistant' && msg.thinking">
+          <span class="inline-block animate-pulse text-slate-400">▌</span>
+        </template>
+
+        <!-- message body -->
+        <span x-html="renderMessage(msg.content)"></span>
+
+        <!-- timestamp -->
+        <span class="block mt-2 text-[10px] tracking-wide opacity-70 select-none"
+              x-text="formatTimestamp(msg.id)"></span>
+      </div>
+
+      <!-- hover actions -->
+      <div  class="absolute -top-3"
+            :class="msg.role==='user' ? 'left-0' : 'right-0 md:-right-6'"
+            x-show="!msg.thinking"
+            x-transition.opacity
+            @mouseenter="$el.parentElement.classList.add('z-10')"
+            @mouseleave="$el.parentElement.classList.remove('z-10')">
+        <button @click="copyMessage(msg)"
+                class="icon-btn hover:bg-white/10"
+                title="Copy">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2"
+               viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8l6 6v6a2 2 0 01-2 2h-2"/>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M14 2v6h6"/>
+          </svg>
+        </button>
+
+        <!-- regenerate only for assistant -->
+        <button x-show="msg.role==='assistant'"
+                @click="regenerate(msg)"
+                class="icon-btn hover:bg-white/10"
+                title="Regenerate">
+          <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"
+               viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M4 4v6h6M20 20v-6h-6M4 10a9 9 0 0115.9-2.4M20 14a9 9 0 01-15.9 2.4"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </template>
+
+</section>
+<!-- /history -->
+
+        <!-- hover actions -->
+        <div class="absolute -top-3 right-0 md:right-full md:mr-2 flex gap-1
+                    opacity-0 group-hover:opacity-100 transition">
+          <button @click="copyMessage(msg)" class="icon-btn hover:bg-white/10" title="Copy">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8l6 6v6a2 2 0 01-2 2h-2"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14 2v6h6"/>
+            </svg>
+          </button>
+
+          <button x-show="msg.role==='assistant'" @click="regenerate(msg)"
+                  class="icon-btn hover:bg-white/10" title="Regenerate">
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2"
+                 viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round"
+                    d="M4 4v6h6M20 20v-6h-6M4 10a9 9 0 0115.9-2.4M20 14a9 9 0 01-15.9 2.4"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </template>
+  </section>
+
+  <!-- ■■■ COMPOSER ■■■ -->
+<!-- ■■■ COMPOSER  — fixed like ChatGPT ■■■ -->
+<section
+  class="fixed inset-x-0 bottom-0 z-50 border-t border-slate-700/50
+         bg-panel/95 backdrop-blur">
+
+  <!-- keep the real content centred -->
+  <div class="max-w-3xl mx-auto px-4 sm:px-5 py-4 space-y-4">
+
+    <!-- credits -->
+    <div class="flex items-center justify-between text-xs">
+      <span class="text-slate-400">Credits remaining</span>
+      <span x-text="user.credits"
+            :class="user.credits<=5 ? 'text-red-400 animate-pulse'
+                                     : 'text-accent'"
+            class="font-semibold"></span>
+    </div>
+
+    <!-- textarea & send -->
+    <form @submit.prevent="sendMessage()"
+          class="relative group"
+          @keydown.enter.exact.prevent="sendMessage()">
+
+      <textarea x-model="input" rows="1"
+                placeholder="Type a message…"
+                class="w-full resize-none rounded-2xl bg-slate-800 px-4 py-3
+                       text-base text-white border border-slate-600
+                       focus:outline-none focus:ring-2 focus:ring-accent
+                       placeholder-slate-400 transition-all
+                       min-h-[48px] max-h-48 overflow-y-auto"
+                :disabled="user.credits<=0 || loading"
+                @input="$event.target.style.height='auto';
+                        $event.target.style.height=$event.target.scrollHeight+'px'"></textarea>
+
+      <button type="submit"
+              :disabled="loading || user.credits<=0 || input.trim()===''"
+              class="absolute bottom-2 right-2 p-2 rounded-full bg-accent text-black
+                     hover:shadow-lg hover:scale-105 active:scale-95 transition
+                     disabled:opacity-50 disabled:cursor-not-allowed">
+        <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2"
+             viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M22 2L11 13M22 2l-6 20-4-9-9-4 20-7z"/>
+        </svg>
+      </button>
+    </form>
+  </div>
+</section>
+
+</div><!-- /center column -->
+
+    <!-- ✦ SCRIPTS ✦ -->
+     
+    <script>
+      
+      function chatApp() {
+        return {
+          // UI State
+          theme: localStorage.getItem('theme') || 'dark',
+          sidebarOpen: true,
+          activeTab: 'gpt4o',
+          tabs: [
+            { id: 'gpt4o', label: 'GPT-4o' },
+            { id: 'gemini', label: 'Gemini' },
+            { id: 'audio', label: 'Audio' },
+            { id: 'image', label: 'Image' },
+            { id: 'video', label: 'Video' }
+          ],
+          input: '',
+          messages: [],
+          loading: false,
+          uploadOpen: false,
+          chatFilter: '',
+          chats: [],
+          filteredChats: [],
+          activeChatId: null,
+
+          // ── Mock User & Bot Avatars ─────────────────────────────
+user: {
+  credits: 42,
+  avatar : 'C:/placeholders/creon.png'},
+bot : {
+  avatar : '/static/placeholders/creon.png'
+},
+
+          // Settings State
+          settings: {
+          geminiPro: false,
+          gpt4oPro: false,
+            temperature: 0.7,
+            maxTokens: 800,
+            persona: 'default',
+            top_p: 1.0,
+            frequency_penalty: 0,
+            presence_penalty: 0,
+            systemPrompt: '',
+            
+
+            geminiModel: 'gemini-pro',
+            geminiTemp: 0.7,
+            geminiTokens: 1000,
+            geminiWeb: true,
+            geminiSafe: true,
+            geminiSystem: '',
+
+            ttsVoice: 'nova',
+            ttsSpeed: 1.0,
+
+            dalleRes: '1024x1024',
+            dalleStyle: 'vivid',
+            imagePro: false,
+            dalleCount: 1,
+            dalleFormat: 'png',
+            dalleQuality: 'standard',
+
+            veoQuality: '1080p',
+            veoDuration: '4',
+            videoPro: false,
+veoFramerate: '24',
+veoAspect: '16:9',
+veoTransition: 'none',
+veoModel: 'veo-v1',
+
+
+
+            chaoticMode: false
+          },
+
+          // Init & Theme
+          initApp() {
+            this.applyTheme();
+            this.loadChats();
+          },
+          toggleTheme() {
+            this.theme = this.theme === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('theme', this.theme);
+            this.applyTheme();
+          },
+          applyTheme() {
+            document.documentElement.classList.toggle('dark', this.theme === 'dark');
+          },
+          // Messaging
+          sendMessage() {
+  if (!this.input.trim()) return;
+
+  const userMsg = {
+    id: Date.now(),
+    role: 'user',
+    content: this.input
+  };
+  this.messages.push(userMsg);
+  const prompt = this.input;
+  this.input = '';
+  this.loading = true;
+  this.user.credits--;
+
+  const replyId = Date.now() + 1;
+  const reply = {
+    id: replyId,
+    role: 'assistant',
+    content: '',
+    thinking: true
+  };
+  this.messages.push(reply);
+
+  // OpenAI stream call
+fetch("/chat-stream", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "gpt-4",
+      messages: [{ role: "user", content: prompt }],
+      stream: true
+    })
+  }).then(async res => {
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder("utf-8");
+    let result = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value, { stream: true });
+
+      const lines = chunk.split("\n").filter(line => line.trim() !== "");
+      for (const line of lines) {
+        if (line.startsWith("data: ")) {
+          const json = line.replace("data: ", "");
+          if (json === "[DONE]") break;
+
+          try {
+            const parsed = JSON.parse(json);
+            const delta = parsed.choices?.[0]?.delta?.content;
+            if (delta) {
+              const idx = this.messages.findIndex(m => m.id === replyId);
+              if (idx !== -1) {
+                this.messages[idx].content += delta;
+                this.messages = [...this.messages]; // force reactivity
+                this.scrollToBottom();
+              }
+            }
+          } catch (e) {
+            console.error("Bad JSON chunk", json, e);
+          }
+        }
+      }
+    }
+
+    const idx = this.messages.findIndex(m => m.id === replyId);
+    if (idx !== -1) {
+      this.messages[idx].thinking = false;
+      this.loading = false;
+    }
+  }).catch(err => {
+    console.error("Stream error:", err);
+    this.loading = false;
+  });
+},
+
+
+          regenerate(msg) {
+            if (this.user.credits <= 0) return;
+            this.user.credits--;
+            this.messages.push({
+              id: Date.now(),
+              role: 'assistant',
+              content: 'Regenerated reply based on previous context.',
+              thinking: false
+            });
+          },
+
+          /* ── chat-utility methods ───────────────────────────────────────── */
+
+copyMessage(msg){
+  navigator.clipboard.writeText(msg.content);
+},
+
+formatTimestamp(id){
+  // The message id was created with Date.now(); turn it into “HH:MM”
+  return new Date(id).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+},
+
+onScroll(){
+  /* placeholder – add infinite-scroll, auto-read, etc. later */
+},
+
+scrollToBottom(){
+  this.$nextTick(() => {
+    const scroller = document.getElementById('chatScroll');
+    if (scroller) scroller.scrollTop = scroller.scrollHeight;
+  });
+},
+          // Chat List
+          filterChats(query) {
+            this.filteredChats = this.chats.filter(c =>
+              c.title.toLowerCase().includes(query.toLowerCase())
+            );
+          },
+
+          loadChats() {
+            // Example Data — replace with backend logic later
+            this.chats = [
+              { id: 1, title: 'Brainstorm Ideas' },
+              { id: 2, title: 'Cursed Owl Promo' },
+              { id: 3, title: 'Daily Digest' }
+            ];
+            this.filteredChats = this.chats;
+          },
+          // Create New Chat
+          newChat() {
+            const newId = Date.now();
+            const title = 'Untitled Chat ' + (this.chats.length + 1);
+            this.chats.push({ id: newId, title });
+            this.filteredChats = this.chats;
+            this.activeChatId = newId;
+            this.messages = [];
+          },
+
+          // Open Existing Chat (future: load messages)
+          openChat(id) {
+            this.activeChatId = id;
+            this.messages = []; // Load previous messages here
+          },
+
+          // Upload placeholder
+          handleUpload() {
+            alert('Upload logic goes here.');
+            this.uploadOpen = false;
+          },
+
+          fileSelected(event) {
+            const file = event.target.files[0];
+            console.log('Selected file:', file);
+            // Future: Upload to server and insert reference
+          },
+
+          // Auth actions
+          signOut() {
+            alert('Signing out...');
+            // TODO: Add actual sign-out logic
+          },
+
+          // Markdown rendering
+          renderMessage(msg) {
+            return marked.parse(msg);
+          }
+        };
+      }
+    </script>
+
+  </body>
+</html>

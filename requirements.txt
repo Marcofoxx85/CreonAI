@@ -1,0 +1,35 @@
+# Core FastAPI & ASGI
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+
+# Templates & Static Files
+jinja2==3.1.3
+
+# Security (JWT, Hashing)
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# OAuth2
+python-multipart==0.0.9
+
+# Environment Management
+python-dotenv==1.0.1
+
+# Database
+sqlalchemy==2.0.30
+
+# Optional: PostgreSQL Support (for future use)
+psycopg2-binary==2.9.10
+
+
+# Stripe
+stripe==9.7.0
+
+# Optional: OpenAI & Gemini clients
+openai==1.30.3
+google-generativeai==0.5.4
+
+# Optional: Async HTTP calls
+httpx==0.27.0
+
+python-jose==3.3.0

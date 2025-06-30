@@ -1,0 +1,432 @@
+<!-- templates/why-us.html | CHUNK 1/8 | LINES 1–100 -->
+<!DOCTYPE html>
+<html lang="en" x-data="themeToggle()" x-init="initTheme()" :class="{ dark: isDark }">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Why CreonAI?</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <style>
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    html.dark body {
+      background-color: #0f172a;
+      color: white;
+    }
+    html:not(.dark) body {
+      background-color: #f9fafb;
+      color: #1e293b;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col transition-colors duration-300">
+
+  <!-- NAVBAR -->
+  <header class="sticky top-0 z-50 backdrop-blur border-b border-slate-700/40 bg-white/90 dark:bg-slate-800/90 shadow-sm">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2 text-2xl font-extrabold tracking-tight">
+        <svg class="w-6 h-6 text-indigo-500" fill="currentColor" viewBox="0 0 24 24"><path d="M13 2 3 14h6v8l10-12h-6V2Z" /></svg>
+        <span><span class="text-indigo-600">Creon</span><span class="dark:text-white">AI</span></span>
+      </a>
+      <nav class="hidden md:flex gap-6 text-sm font-medium">
+        <a href="/" class="hover:text-indigo-500">Home</a>
+        <a href="/chat" class="hover:text-indigo-500">Chat</a>
+        <a href="/library" class="hover:text-indigo-500">Library</a>
+        <a href="/credits" class="hover:text-indigo-500">Credits</a>
+        <a href="/profile" class="hover:text-indigo-500">Profile</a>
+        <a href="/subscribe" class="hover:text-indigo-500">Subscribe</a>
+      </nav>
+      <!-- Theme toggle -->
+      <button @click="toggleTheme()" class="ml-4 p-2 rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition" aria-label="Toggle dark mode">
+        <template x-if="isDark">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 0111.21 3 7 7 0 0021 12.79z" />
+          </svg>
+        </template>
+        <template x-if="!isDark">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 3v1m0 16v1m8.66-11.66l-.7.7M7.04 5.04l-.7-.7m14.14 9.9l-.7-.7M4 12H3m18 0h1m-3.66 6.34l.7-.7m-12.72 0l.7.7" />
+          </svg>
+        </template>
+      </button>
+    </div>
+  </header>
+
+  <!-- HERO SECTION -->
+  <section class="text-center px-6 py-20 sm:py-28 max-w-4xl mx-auto space-y-8">
+    <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+      Why Choose <span class="text-indigo-500">CreonAI?</span>
+    </h1>
+    <p class="text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-xl mx-auto">
+      CreonAI is your unified AI creation studio—chat, create, and publish across text, image, audio, and video.
+    </p>
+    <div class="flex justify-center">
+      <a href="/register" class="inline-block px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm rounded-lg shadow transition">
+        Create an Account
+      </a>
+    </div>
+  </section>
+<!-- templates/why-us.html | CHUNK 2/8 | LINES 101–200 -->
+  <!-- ✦ WHY WE’RE DIFFERENT ✦ -->
+  <section class="max-w-6xl mx-auto px-6 py-20 space-y-14">
+    <div class="grid md:grid-cols-2 gap-10">
+      <!-- Feature 1 -->
+      <div class="bg-indigo-50 dark:bg-slate-800/60 p-6 rounded-xl border border-slate-700/40 shadow-md">
+        <h2 class="text-xl font-bold text-indigo-600 dark:text-indigo-300 mb-2">
+          ⚡ Multi-Model Power
+        </h2>
+        <p class="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
+          CreonAI combines OpenAI’s <strong>GPT-4o</strong>, Google’s <strong>Gemini Pro</strong>, and Veo 3 — giving you smart, creative, and cinematic capabilities all in one chat.
+        </p>
+      </div>
+      <!-- Feature 2 -->
+      <div class="bg-indigo-50 dark:bg-slate-800/60 p-6 rounded-xl border border-slate-700/40 shadow-md">
+        <h2 class="text-xl font-bold text-indigo-600 dark:text-indigo-300 mb-2">
+          🔒 Private by Design
+        </h2>
+        <p class="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
+          We never track or sell data. Your prompts and conversations stay yours—encrypted in transit and storage, fully GDPR & CCPA compliant.
+        </p>
+      </div>
+      <!-- Feature 3 -->
+      <div class="bg-indigo-50 dark:bg-slate-800/60 p-6 rounded-xl border border-slate-700/40 shadow-md">
+        <h2 class="text-xl font-bold text-indigo-600 dark:text-indigo-300 mb-2">
+          🚀 Built for Creators
+        </h2>
+        <p class="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
+          Generate scripts, thumbnails, voiceovers, and social-ready videos without switching tabs. Batch-process TikToks, YouTube Shorts, and more.
+        </p>
+      </div>
+      <!-- Feature 4 -->
+      <div class="bg-indigo-50 dark:bg-slate-800/60 p-6 rounded-xl border border-slate-700/40 shadow-md">
+        <h2 class="text-xl font-bold text-indigo-600 dark:text-indigo-300 mb-2">
+          🧠 Streamed Thinking
+        </h2>
+        <p class="text-slate-700 dark:text-slate-300 text-sm leading-relaxed">
+          Experience real-time token streaming for chat responses—no waiting, just ideas flowing as fast as you can read.
+        </p>
+      </div>
+    </div>
+
+    <!-- Sub-CTA -->
+    <div class="mt-16 text-center space-y-3">
+      <p class="text-sm text-slate-500 dark:text-slate-400">
+        Don’t just generate. <strong>Create</strong> with a unified AI lab.
+      </p>
+      <a href="/chat" class="inline-block px-6 py-3 bg-indigo-600 text-white font-medium rounded-lg shadow hover:bg-indigo-700 transition">
+        Try the Chat Interface →
+      </a>
+    </div>
+  </section>
+<!-- templates/why-us.html | CHUNK 3/8 | LINES 201–350 -->
+  <!-- ✦ MODEL CAPABILITIES BREAKDOWN ✦ -->
+  <section class="max-w-4xl mx-auto px-6 py-20 space-y-8" x-data="{ open: null, models: [
+      { title: 'GPT-4o (OpenAI)', desc: 'Top-tier language understanding & generation, real-time streaming for writing, logic, and ideation.' },
+      { title: 'Gemini Pro (Google)', desc: 'Strong factual accuracy, image understanding, and versatile conversation flows.' },
+      { title: 'Veo 3 (Google)', desc: 'Cinematic short-form video synthesis—turn text prompts into stunning clips.' }
+    ] }">
+    <h2 class="text-2xl font-bold text-center mb-6">🤖 Model Capabilities Breakdown</h2>
+    <template x-for="(m, i) in models" :key="i">
+      <div class="border border-slate-700/40 rounded-lg overflow-hidden">
+        <button
+          @click="open = open === i ? null : i"
+          class="w-full text-left px-6 py-4 bg-slate-800/60 text-sm sm:text-base font-semibold flex items-center justify-between">
+          <span x-text="m.title"></span>
+          <svg class="w-5 h-5 transition-transform"
+               :class="{ 'rotate-180 text-indigo-500': open === i, 'text-slate-400': open !== i }"
+               fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <div x-show="open === i" x-collapse class="px-6 py-4 bg-slate-700/30 text-sm text-slate-300">
+          <p x-text="m.desc"></p>
+        </div>
+      </div>
+    </template>
+  </section>
+<!-- templates/why-us.html | CHUNK 4/8 | LINES 351–500 -->
+
+  <!-- ✦ USE CASE GRID ✦ -->
+  <section class="bg-slate-100 dark:bg-slate-900/40 border-y border-slate-300/20 dark:border-slate-700 py-20 px-6">
+    <div class="max-w-6xl mx-auto space-y-12">
+      <h2 class="text-3xl font-bold text-center">How People Use CreonAI</h2>
+      <div class="grid md:grid-cols-3 gap-6">
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 space-y-3 border border-slate-200/50 dark:border-slate-700/50">
+          <h3 class="text-lg font-bold text-indigo-600 dark:text-indigo-300">🎬 TikTok Creators</h3>
+          <p class="text-sm text-slate-700 dark:text-slate-300">
+            Batch-generate meme videos, auto-edit captions with GPT, then post directly on your schedule.
+          </p>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 space-y-3 border border-slate-200/50 dark:border-slate-700/50">
+          <h3 class="text-lg font-bold text-indigo-600 dark:text-indigo-300">🧠 Agency Teams</h3>
+          <p class="text-sm text-slate-700 dark:text-slate-300">
+            Collaborate on branded scripts, voiceovers, and Veo-powered visuals to scale client campaigns.
+          </p>
+        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-xl p-6 space-y-3 border border-slate-200/50 dark:border-slate-700/50">
+          <h3 class="text-lg font-bold text-indigo-600 dark:text-indigo-300">🎓 Students</h3>
+          <p class="text-sm text-slate-700 dark:text-slate-300">
+            Summarize research, brainstorm essays, generate study guides, and prototype presentations—all in one chat.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ✦ TESTIMONIAL STRIPE ✦ -->
+  <section class="py-24 px-6 text-center space-y-12 max-w-4xl mx-auto">
+    <h2 class="text-3xl font-bold">What Our Users Say</h2>
+    <div class="grid gap-10 sm:grid-cols-2">
+      <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200/40 dark:border-slate-700/40 space-y-3">
+        <p class="text-sm text-slate-600 dark:text-slate-300">
+          “I used to jump between ChatGPT, Gemini, and video editors. Now everything’s in one tab—CreonAI just works.”  
+        </p>
+        <div class="text-sm font-semibold text-indigo-600 dark:text-indigo-400">— Max, Content Strategist</div>
+      </div>
+      <div class="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200/40 dark:border-slate-700/40 space-y-3">
+        <p class="text-sm text-slate-600 dark:text-slate-300">
+          “Producing short-form video ads is 10× faster. Veo integration is a beast!”  
+        </p>
+        <div class="text-sm font-semibold text-indigo-600 dark:text-indigo-400">— Dana, TikTok Ad Agency</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ✦ DYNAMIC SCROLL FX DEMO ✦ -->
+  <section class="py-20 px-6 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 text-white">
+    <div class="max-w-3xl mx-auto text-center space-y-6">
+      <h2 class="text-3xl font-bold tracking-tight">One Prompt. Infinite Possibilities.</h2>
+      <p class="text-lg">Watch your ideas transform across models—text, image, audio, and video—in real time.</p>
+      <button
+        @click="document.location.href='/chat'"
+        class="inline-block px-6 py-3 bg-white text-indigo-700 font-semibold rounded-lg shadow hover:bg-gray-100 transition"
+      >
+        Jump to Chat Demo →
+      </button>
+    </div>
+  </section>
+<!-- templates/why-us.html | CHUNK 5/8 | LINES 501–650 -->
+
+  <!-- ✦ SIDE-BY-SIDE COMPARISON ✦ -->
+  <section class="py-24 px-6 max-w-6xl mx-auto space-y-12">
+    <h2 class="text-3xl font-bold text-center">CreonAI vs The Rest</h2>
+    <div class="overflow-x-auto border border-slate-300/30 dark:border-slate-700/40 rounded-xl">
+      <table class="min-w-full text-sm text-left">
+        <thead class="bg-slate-200 dark:bg-slate-800">
+          <tr class="text-xs uppercase text-slate-500 dark:text-slate-400 tracking-wide">
+            <th class="p-4 font-medium">Feature</th>
+            <th class="p-4 font-medium text-indigo-600 dark:text-indigo-400">CreonAI</th>
+            <th class="p-4 font-medium">ChatGPT</th>
+            <th class="p-4 font-medium">Gemini</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+          <tr>
+            <td class="p-4">Multi‐model integration (GPT+Gemini+Veo)</td>
+            <td class="p-4 font-semibold text-green-500">✅</td>
+            <td class="p-4 text-slate-400">❌</td>
+            <td class="p-4 text-slate-400">❌</td>
+          </tr>
+          <tr>
+            <td class="p-4">Real-time streaming chat</td>
+            <td class="p-4 font-semibold text-green-500">✅</td>
+            <td class="p-4 text-green-500">✅</td>
+            <td class="p-4 text-slate-400">❌</td>
+          </tr>
+          <tr>
+            <td class="p-4">Video generation (Veo 3)</td>
+            <td class="p-4 font-semibold text-green-500">✅</td>
+            <td class="p-4 text-slate-400">❌</td>
+            <td class="p-4 text-green-500">✅</td>
+          </tr>
+          <tr>
+            <td class="p-4">Free trial with no login</td>
+            <td class="p-4 font-semibold text-green-500">✅</td>
+            <td class="p-4 text-slate-400">❌</td>
+            <td class="p-4 text-slate-400">❌</td>
+          </tr>
+          <tr>
+            <td class="p-4">TikTok-ready output</td>
+            <td class="p-4 font-semibold text-green-500">✅</td>
+            <td class="p-4 text-slate-400">❌</td>
+            <td class="p-4 text-slate-400">❌</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ✦ TRUST SIGNALS ✦ -->
+  <section class="bg-white dark:bg-slate-800 py-20 border-y border-slate-200/30 dark:border-slate-700/30">
+    <div class="max-w-4xl mx-auto text-center space-y-6">
+      <h2 class="text-3xl font-bold">Trusted by Early Creators</h2>
+      <p class="text-slate-500 dark:text-slate-300 max-w-xl mx-auto">
+        CreonAI is already empowering hundreds of creators to think faster, create smarter, and scale their content.
+      </p>
+      <a href="/subscribe"
+         class="inline-block px-8 py-3 mt-4 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-indigo-700 transition shadow">
+        Join the Launch List →
+      </a>
+    </div>
+  </section>
+<!-- templates/why-us.html | CHUNK 6/8 | LINES 651–800 -->
+  <!-- ✦ MINI FAQ ✦ -->
+  <section class="py-20 px-6 max-w-4xl mx-auto space-y-8" x-data="{ open: null }">
+    <h2 class="text-2xl font-bold text-center">Quick Answers</h2>
+    <div class="space-y-4">
+      <div class="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+        <button
+          @click="open = open === 1 ? null : 1"
+          class="w-full px-6 py-4 text-left flex justify-between items-center bg-slate-100 dark:bg-slate-900 font-semibold">
+          Can I try it free?
+          <svg :class="open === 1 ? 'transform rotate-180 text-indigo-500' : 'text-slate-400'" 
+               class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <div x-show="open === 1" x-collapse class="px-6 py-4 bg-slate-50 dark:bg-slate-800 text-sm text-slate-600 dark:text-slate-300">
+          Yes—you can demo all three models without registering. Chat as much as you like, free.
+        </div>
+      </div>
+      <div class="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+        <button
+          @click="open = open === 2 ? null : 2"
+          class="w-full px-6 py-4 text-left flex justify-between items-center bg-slate-100 dark:bg-slate-900 font-semibold">
+          Are credits refundable?
+          <svg :class="open === 2 ? 'transform rotate-180 text-indigo-500' : 'text-slate-400'" 
+               class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <div x-show="open === 2" x-collapse class="px-6 py-4 bg-slate-50 dark:bg-slate-800 text-sm text-slate-600 dark:text-slate-300">
+          You can request a refund within 14 days of purchase for any unused credits.
+        </div>
+      </div>
+      <div class="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+        <button
+          @click="open = open === 3 ? null : 3"
+          class="w-full px-6 py-4 text-left flex justify-between items-center bg-slate-100 dark:bg-slate-900 font-semibold">
+          Can I upgrade plans later?
+          <svg :class="open === 3 ? 'transform rotate-180 text-indigo-500' : 'text-slate-400'" 
+               class="w-5 h-5 transition-transform" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
+          </svg>
+        </button>
+        <div x-show="open === 3" x-collapse class="px-6 py-4 bg-slate-50 dark:bg-slate-800 text-sm text-slate-600 dark:text-slate-300">
+          Absolutely—you can top-up credits or switch to unlimited subscription any time.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ✦ CREATOR TESTIMONIALS ✦ -->
+  <section class="bg-indigo-50 dark:bg-slate-900 py-24 px-6">
+    <div class="max-w-5xl mx-auto text-center space-y-12">
+      <h2 class="text-3xl font-bold">Hear from Creators</h2>
+      <div class="grid gap-8 md:grid-cols-3">
+        <blockquote class="p-6 bg-white dark:bg-slate-800 rounded-xl shadow text-slate-700 dark:text-slate-300">
+          “CreonAI saved me hours every week—batching TikToks and voiceovers in seconds.”
+          <footer class="mt-4 text-sm text-indigo-600 dark:text-indigo-400">— Alex, YouTuber</footer>
+        </blockquote>
+        <blockquote class="p-6 bg-white dark:bg-slate-800 rounded-xl shadow text-slate-700 dark:text-slate-300">
+          “The Veo video quality is insane. My agency’s content output doubled!”
+          <footer class="mt-4 text-sm text-indigo-600 dark:text-indigo-400">— Mia, Digital Marketer</footer>
+        </blockquote>
+        <blockquote class="p-6 bg-white dark:bg-slate-800 rounded-xl shadow text-slate-700 dark:text-slate-300">
+          “No login barrier let me test instantly. Now it’s my daily research assistant.”
+          <footer class="mt-4 text-sm text-indigo-600 dark:text-indigo-400">— Jordan, Student</footer>
+        </blockquote>
+      </div>
+    </div>
+  </section>
+
+  <!-- ✦ BONUS FOR CREATORS ✦ -->
+  <section class="py-24 px-6 max-w-4xl mx-auto text-center space-y-10">
+    <h2 class="text-3xl font-bold">Built for Creators & Hustlers</h2>
+    <p class="text-slate-600 dark:text-slate-400">
+      Whether you’re a one-person show or a growing team, CreonAI gives you the tools to ideate, iterate, and publish—faster.
+    </p>
+    <div class="grid sm:grid-cols-2 gap-6">
+      <div class="p-6 bg-white dark:bg-slate-800 rounded-xl shadow space-y-2">
+        <h3 class="font-semibold text-indigo-600 dark:text-indigo-400">📅 Content Calendar</h3>
+        <p class="text-sm text-slate-600 dark:text-slate-300">Plan and batch-generate a week of Shorts, TikToks, & carousels in minutes.</p>
+      </div>
+      <div class="p-6 bg-white dark:bg-slate-800 rounded-xl shadow space-y-2">
+        <h3 class="font-semibold text-indigo-600 dark:text-indigo-400">🔍 Trend Companion</h3>
+        <p class="text-sm text-slate-600 dark:text-slate-300">Auto-detect trending topics and spin up hooks & formats instantly.</p>
+      </div>
+      <div class="p-6 bg-white dark:bg-slate-800 rounded-xl shadow space-y-2">
+        <h3 class="font-semibold text-indigo-600 dark:text-indigo-400">🖼️ Visual Wizard</h3>
+        <p class="text-sm text-slate-600 dark:text-slate-300">Generate brand guides, thumbnail palettes & moodboards with one prompt.</p>
+      </div>
+      <div class="p-6 bg-white dark:bg-slate-800 rounded-xl shadow space-y-2">
+        <h3 class="font-semibold text-indigo-600 dark:text-indigo-400">🎙️ Voice Style Editor</h3>
+        <p class="text-sm text-slate-600 dark:text-slate-300">Craft your own AI voice & tone for narration or character-driven chat.</p>
+      </div>
+    </div>
+  </section>
+<!-- templates/why-us.html | CHUNK 7/8 | LINES 801–900 -->
+  <!-- ✦ FINAL CTA BANNER ✦ -->
+  <section class="py-20 px-6 bg-gradient-to-r from-indigo-100 via-purple-100 to-pink-100 dark:from-slate-800/40 dark:via-slate-700/40 dark:to-slate-600/40 border-t border-slate-300/30 dark:border-slate-700/30">
+    <div class="max-w-4xl mx-auto flex flex-col items-center text-center gap-8">
+      <h2 class="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+        Ready to Create with AI <span class="text-indigo-600">Your Way?</span>
+      </h2>
+      <p class="text-lg text-slate-700 dark:text-slate-300 max-w-xl">
+        Start free, pay for what you use, and discover why <strong>CreonAI</strong> is the new standard for creators.
+      </p>
+      <a href="/register"
+         class="inline-block px-10 py-4 bg-indigo-600 text-white rounded-2xl font-extrabold text-xl tracking-wide shadow hover:bg-indigo-700 transition">
+        Create Your Free Account →
+      </a>
+      <div class="flex flex-wrap gap-4 justify-center mt-6">
+        <span class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/70 dark:bg-slate-800/80 border border-slate-300/20 text-xs font-semibold text-slate-600 dark:text-slate-300 shadow">
+          No Credit Card Needed
+        </span>
+        <span class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/70 dark:bg-slate-800/80 border border-slate-300/20 text-xs font-semibold text-slate-600 dark:text-slate-300 shadow">
+          GDPR & CCPA Ready
+        </span>
+        <span class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/70 dark:bg-slate-800/80 border border-slate-300/20 text-xs font-semibold text-slate-600 dark:text-slate-300 shadow">
+          Cancel Anytime
+        </span>
+      </div>
+    </div>
+  </section>
+<!-- templates/why-us.html | CHUNK 8/8 | LINES 901–END -->
+  <!-- FOOTER -->
+  <footer class="mt-auto border-t border-slate-300/30 dark:border-slate-700/30 bg-white/90 dark:bg-slate-800/90 backdrop-blur py-8">
+    <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between text-sm text-slate-600 dark:text-slate-400">
+      <p>© <span id="year"></span> CreonAI • All rights reserved.</p>
+      <nav class="flex gap-6">
+        <a href="/terms" class="hover:text-indigo-600">Terms</a>
+        <a href="/privacy" class="hover:text-indigo-600">Privacy</a>
+        <a href="mailto:hello@creon.ai" class="hover:text-indigo-600">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    // Theme toggle component
+    function themeToggle() {
+      return {
+        isDark: false,
+        initTheme() {
+          this.isDark = localStorage.theme === 'dark' ||
+            (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches);
+          document.documentElement.classList.toggle('dark', this.isDark);
+        },
+        toggleTheme() {
+          this.isDark = !this.isDark;
+          document.documentElement.classList.toggle('dark', this.isDark);
+          localStorage.theme = this.isDark ? 'dark' : 'light';
+        }
+      }
+    }
+    // Set current year
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

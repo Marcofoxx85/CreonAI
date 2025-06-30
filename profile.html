@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en" x-data="profilePage()" x-init="initTheme()" :class="{ dark: isDark }">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>CreonAI • Your Profile</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <style>
+    [x-cloak] { display: none !important; }
+  </style>
+</head>
+<body :class="isDark ? 'dark bg-slate-900 text-white' : 'bg-white text-slate-800'" class="min-h-screen flex flex-col transition duration-300 font-sans">
+
+  <!-- NAVBAR -->
+  <header class="sticky top-0 z-50 bg-white/80 dark:bg-slate-800/80 backdrop-blur border-b border-slate-200 dark:border-slate-700 shadow-sm">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+      <a href="/" class="flex items-center gap-2 text-2xl font-extrabold tracking-tight">
+        <img src="/logo.png" alt="Logo" class="h-8 w-8 object-contain" />
+        <span><span class="text-indigo-600">Creon</span><span class="dark:text-white">AI</span></span>
+      </a>
+      <nav class="hidden md:flex gap-6 text-sm font-medium">
+        <a href="/chat" class="hover:text-indigo-600">Chat</a>
+        <a href="/profile" class="text-indigo-600 font-bold underline">Profile</a>
+        <a href="/credits" class="hover:text-indigo-600">Credits</a>
+        <a href="/why-us" class="hover:text-indigo-600">Why Us?</a>
+        <a href="/logout" class="hover:text-red-500">Logout</a>
+      </nav>
+      <button @click="toggleTheme()" class="ml-4 p-2 rounded hover:bg-slate-100 dark:hover:bg-slate-700 transition" aria-label="Toggle theme">
+        <template x-if="isDark">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 0111.21 3 7 7 0 0021 12.79z" /></svg>
+        </template>
+        <template x-if="!isDark">
+          <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293a8 8 0 11-10.586-10.586A8 8 0 0017.293 13.293z"/></svg>
+        </template>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN PROFILE SECTION -->
+  <main class="flex-1 w-full max-w-6xl mx-auto px-4 py-10 space-y-12">
+
+    <!-- PROFILE HEADER -->
+    <section class="flex flex-col md:flex-row items-center gap-8">
+      <div class="relative">
+        <img :src="user.avatar" class="h-32 w-32 rounded-full border-4 border-indigo-500 object-cover shadow" />
+        <button @click="showAvatarModal = true"
+                class="absolute bottom-1 right-1 p-1.5 bg-indigo-600 text-white rounded-full shadow hover:bg-indigo-700 transition">
+          ✎
+        </button>
+      </div>
+      <div class="flex-1 space-y-2">
+        <div class="text-xl font-bold" x-text="user.displayName"></div>
+        <div class="text-sm text-slate-500" x-text="user.email"></div>
+        <div class="flex gap-3 mt-3">
+          <button @click="editMode = true" class="bg-indigo-600 text-white px-4 py-1.5 rounded hover:bg-indigo-700 transition">
+            Edit Info
+          </button>
+          <button @click="showPasswordModal = true" class="bg-slate-200 dark:bg-slate-700 px-4 py-1.5 rounded hover:bg-slate-300 dark:hover:bg-slate-600">
+            Change Password
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">Usage Summary</h2>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+        <div class="bg-slate-100 dark:bg-slate-700 p-4 rounded shadow-sm">
+          <div class="text-3xl font-bold" x-text="stats.chats"></div>
+          <p class="text-sm text-slate-500">Chats</p>
+        </div>
+        <div class="bg-slate-100 dark:bg-slate-700 p-4 rounded shadow-sm">
+          <div class="text-3xl font-bold" x-text="stats.images"></div>
+          <p class="text-sm text-slate-500">Images Generated</p>
+        </div>
+        <div class="bg-slate-100 dark:bg-slate-700 p-4 rounded shadow-sm">
+          <div class="text-3xl font-bold" x-text="stats.videos"></div>
+          <p class="text-sm text-slate-500">Videos Generated</p>
+        </div>
+        <div class="bg-slate-100 dark:bg-slate-700 p-4 rounded shadow-sm">
+          <div class="text-3xl font-bold" x-text="credits"></div>
+          <p class="text-sm text-slate-500">Remaining Credits</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SUBSCRIPTION -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">Plan & Subscription</h2>
+      <div class="flex flex-col sm:flex-row justify-between items-center gap-4 p-4 bg-slate-100 dark:bg-slate-700 rounded">
+        <div class="text-lg font-medium" x-text="plan"></div>
+        <div class="text-sm text-slate-500">Renewal: <span x-text="renewalDate"></span></div>
+        <div class="flex gap-2">
+          <button @click="upgradePlan()" class="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700">Upgrade</button>
+          <button @click="manageBilling()" class="bg-slate-200 dark:bg-slate-600 px-4 py-2 rounded hover:bg-slate-300 dark:hover:bg-slate-500">
+            Billing Settings
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTINUED IN PART 2… -->
+    <!-- API KEYS -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">API Keys</h2>
+      <div class="space-y-3">
+        <template x-for="(key, i) in apiKeys" :key="i">
+          <div class="flex justify-between items-center bg-slate-100 dark:bg-slate-700 rounded px-4 py-2">
+            <div>
+              <div class="font-medium" x-text="key.name"></div>
+              <div class="text-xs text-slate-500" x-text="key.value"></div>
+            </div>
+            <div class="flex gap-2">
+              <button @click="copyApiKey(key.value)" class="text-sm bg-slate-200 dark:bg-slate-600 px-3 py-1 rounded">Copy</button>
+              <button @click="regenerateApiKey(i)" class="text-sm bg-red-500 text-white px-3 py-1 rounded">Regenerate</button>
+            </div>
+          </div>
+        </template>
+        <button @click="createApiKey()" class="mt-2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+          + Create New Key
+        </button>
+      </div>
+    </section>
+
+    <!-- CONNECTED APPS -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">Connected Applications</h2>
+      <template x-for="app in connectedApps" :key="app">
+        <div class="flex justify-between items-center bg-slate-100 dark:bg-slate-700 px-4 py-2 rounded mb-2">
+          <span x-text="app"></span>
+          <button @click="disconnectApp(app)" class="text-red-500 hover:underline text-sm">Disconnect</button>
+        </div>
+      </template>
+      <button @click="connectApp()" class="mt-2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">
+        + Connect New App
+      </button>
+    </section>
+
+    <!-- NOTIFICATIONS -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">Notifications</h2>
+      <div class="space-y-3">
+        <div class="flex justify-between bg-slate-100 dark:bg-slate-700 px-4 py-2 rounded">
+          <span>Email Alerts</span>
+          <input type="checkbox" x-model="notifications.email" class="h-5 w-5 accent-indigo-600">
+        </div>
+        <div class="flex justify-between bg-slate-100 dark:bg-slate-700 px-4 py-2 rounded">
+          <span>SMS Alerts</span>
+          <input type="checkbox" x-model="notifications.sms" class="h-5 w-5 accent-indigo-600">
+        </div>
+        <div class="flex justify-between bg-slate-100 dark:bg-slate-700 px-4 py-2 rounded">
+          <span>Weekly Summary</span>
+          <input type="checkbox" x-model="notifications.digest" class="h-5 w-5 accent-indigo-600">
+        </div>
+      </div>
+    </section>
+
+    <!-- ACTIVITY LOG -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">Recent Activity</h2>
+      <ul class="space-y-2 text-sm">
+        <template x-for="entry in activityLog" :key="entry.time">
+          <li class="flex justify-between px-4 py-2 bg-slate-100 dark:bg-slate-700 rounded">
+            <span x-text="entry.action"></span>
+            <span class="text-slate-500 text-xs" x-text="entry.time"></span>
+          </li>
+        </template>
+      </ul>
+    </section>
+
+    <!-- SECURITY OPTIONS -->
+    <section>
+      <h2 class="text-xl font-semibold mb-4">Security</h2>
+      <div class="flex justify-between items-center bg-slate-100 dark:bg-slate-700 px-4 py-2 rounded">
+        <span>Two-Factor Authentication</span>
+        <input type="checkbox" x-model="twoFAEnabled" class="h-5 w-5 accent-indigo-600">
+      </div>
+      <button @click="showPasswordModal = true" class="mt-4 px-4 py-2 bg-slate-600 text-white rounded hover:bg-slate-500">
+        Change Password
+      </button>
+    </section>
+
+    <!-- DELETE ACCOUNT -->
+    <section class="border-t border-slate-600/30 pt-8 mt-12">
+      <h2 class="text-xl font-semibold text-red-500 mb-4">Danger Zone</h2>
+      <button @click="deleteAccount()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded">
+        Delete My Account
+      </button>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="text-center text-sm text-slate-500 py-6 border-t border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70">
+    &copy; <span x-text="new Date().getFullYear()"></span> CreonAI. Built for creators.
+  </footer>
+
+  <!-- SCRIPT LOGIC -->
+  <script>
+    function profilePage() {
+      return {
+        isDark: false,
+        initTheme() {
+          this.isDark = localStorage.theme === 'dark' || (!localStorage.theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+        },
+        toggleTheme() {
+          this.isDark = !this.isDark;
+          localStorage.theme = this.isDark ? 'dark' : 'light';
+        },
+
+        // State
+        editMode: false,
+        showAvatarModal: false,
+        showPasswordModal: false,
+        twoFAEnabled: true,
+        user: {
+          username: 'marco_fox',
+          email: 'marco@example.com',
+          displayName: 'Marco Fox',
+          avatar: 'https://i.pravatar.cc/150?img=12'
+        },
+        stats: { chats: 231, creditsUsed: 912, images: 67, videos: 18 },
+        credits: 88,
+        plan: 'Pro Monthly',
+        renewalDate: '2025-07-01',
+        apiKeys: [{ name: 'Main API', value: 'sk-test-1a2b3c4d5e' }],
+        connectedApps: ['Google Drive', 'Notion'],
+        notifications: { email: true, sms: false, digest: true },
+        activityLog: [
+          { time: '2025-06-23 14:42', action: 'Logged in' },
+          { time: '2025-06-23 12:21', action: 'Generated image' },
+          { time: '2025-06-22 19:58', action: 'Updated settings' }
+        ],
+
+        handleAvatarUpload(e) {
+          const file = e.target.files[0];
+          if (file) this.user.avatar = URL.createObjectURL(file);
+        },
+        confirmAvatar() {
+          this.showAvatarModal = false;
+          alert('Avatar saved! (mock)');
+        },
+        topUpCredits() {
+          alert('Redirecting to top-up page...');
+        },
+        upgradePlan() {
+          alert('Upgrade modal coming soon...');
+        },
+        manageBilling() {
+          alert('Opening billing settings...');
+        },
+        copyApiKey(v) {
+          navigator.clipboard.writeText(v);
+          alert('API key copied!');
+        },
+        regenerateApiKey(i) {
+          this.apiKeys[i].value = 'sk-test-' + Math.random().toString(36).substring(2, 18);
+        },
+        createApiKey() {
+          this.apiKeys.push({ name: 'New Key', value: 'sk-test-' + Math.random().toString(36).substring(2, 18) });
+        },
+        connectApp() {
+          alert('OAuth integration not implemented yet.');
+        },
+        disconnectApp(app) {
+          this.connectedApps = this.connectedApps.filter(a => a !== app);
+        },
+        deleteAccount() {
+          if (confirm("Are you sure? This can't be undone.")) {
+            alert("Account deleted (stub)");
+          }
+        }
+      }
+    }
+  </script>
+</body>
+</html>
