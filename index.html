@@ -34,9 +34,10 @@
                   #050618;
       z-index: -2;
     }
-    canvas#starfield {
-      position: fixed; inset: 0; z-index: -1;
-    }
+    /* Star-field layers */
+canvas.star { position:fixed; inset:0; z-index:-1; pointer-events:none; }
+canvas.blur { filter:blur(1.5px); opacity:.6; }
+
     /* Glitch text effect */
     .glitch {
       position: relative;
@@ -94,34 +95,58 @@
 
   <!-- Animated canvas background -->
   <canvas id="starfield"></canvas>
-  <script>
-    /* Minimal starfield */
-    const c = document.getElementById('starfield');
-    const ctx = c.getContext('2d'), stars = 120;
-    let w, h;
-    function resize(){
-      w = c.width  = window.innerWidth;
-      h = c.height = window.innerHeight;
+ <!-- Animated canvas background (dual-layer + parallax) -->
+<canvas id="stars-back"  class="star blur"></canvas>
+<canvas id="stars-front" class="star"></canvas>
+
+<script>
+/* ========= STARFIELD DEPTH ENGINE ========= */
+class StarLayer{
+  constructor(canvas,count,speed){
+    this.canvas = canvas;
+    this.ctx    = canvas.getContext('2d');
+    this.count  = count;
+    this.base   = speed;
+    this.speed  = speed;
+    this.stars  = [];
+    this.resize();
+    addEventListener('resize', () => this.resize());
+    for(let i=0;i<count;i++) this.stars.push({x:0,y:0,z:0,o:Math.random()*0.8+0.2});
+    this.reset(); requestAnimationFrame(()=>this.loop());
+  }
+  resize(){this.w=this.canvas.width=innerWidth; this.h=this.canvas.height=innerHeight;}
+  reset(){this.stars.forEach(s=>{s.x=(Math.random()*2-1)*this.w; s.y=(Math.random()*2-1)*this.h; s.z=Math.random()*this.w;});}
+  loop(){
+    const g=this.ctx; g.clearRect(0,0,this.w,this.h);
+    for(const s of this.stars){
+      s.z-=this.speed; if(s.z<=0) s.z=this.w;
+      const k=128/s.z, px=s.x*k+this.w/2, py=s.y*k+this.h/2, size=(1-s.z/this.w)*2;
+      if(px<0||px>=this.w||py<0||py>=this.h) continue;
+      g.globalAlpha=s.o; g.beginPath(); g.arc(px,py,size,0,6.283); g.fillStyle='#fff'; g.fill();
     }
-    window.addEventListener('resize', resize); resize();
-    const pts = Array.from({length: stars}, () => ({
-      x: Math.random()*w,
-      y: Math.random()*h,
-      vx:(Math.random()-0.5)*0.3,
-      vy:(Math.random()-0.5)*0.3
-    }));
-    function draw(){
-      ctx.clearRect(0,0,w,h);
-      ctx.fillStyle='#a855f7';
-      pts.forEach(p=>{
-        p.x = (p.x + p.vx + w) % w;
-        p.y = (p.y + p.vy + h) % h;
-        ctx.beginPath();
-        ctx.arc(p.x,p.y,1.2,0,Math.PI*2); ctx.fill();
-      });
-      requestAnimationFrame(draw);
-    } draw();
-  </script>
+    requestAnimationFrame(()=>this.loop());
+  }
+}
+const back  = new StarLayer(document.getElementById('stars-back'), 600, 0.5);
+const front = new StarLayer(document.getElementById('stars-front'), 180, 1.2);
+
+/* ========= Pointer-parallax (motion-safe) ========= */
+if(!matchMedia('(prefers-reduced-motion: reduce)').matches){
+  addEventListener('pointermove', e=>{
+    const x=(e.clientX/innerWidth -0.5)*2, y=(e.clientY/innerHeight-0.5)*2;
+    back .canvas.style.transform=`translate(${x*10}px,${y*10}px)`;
+    front.canvas.style.transform=`translate(${x*20}px,${y*20}px)`;
+  });
+}
+
+/* ========= Pause when tab hidden ========= */
+addEventListener('visibilitychange', ()=>{
+  const on=!document.hidden;
+  back .speed = on ? back .base : 0;
+  front.speed = on ? front.base : 0;
+});
+</script>
+
 
   <!-- NAVBAR -->
   <header class="relative z-20">
