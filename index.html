@@ -26,14 +26,13 @@
   <!-- Custom styles -->
   <style>
     /* Star-field background */
-    body::before {
-      content: '';
-      position: fixed;
-      inset: 0;
-      background: radial-gradient(circle at 50% 30%, rgba(79,70,229,.15), transparent 70%),
-                  #050618;
-      z-index: -2;
-    }
+  body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: black;
+  z-index: -2;
+}
     /* Star-field layers */
 canvas.star { position:fixed; inset:0; z-index:-1; pointer-events:none; }
 canvas.blur { filter:blur(1.5px); opacity:.6; }
@@ -187,7 +186,7 @@ addEventListener('visibilitychange', ()=>{
       x-show="open" x-transition.opacity.duration.300ms
       class="lg:hidden fixed inset-0 z-30 bg-black/70 backdrop-blur-sm flex">
       <aside x-show="open" x-transition.origin.left
-             class="w-72 bg-[#0f1129] p-6 overflow-y-auto">
+             class="w-72 bg-[#000000] p-6 overflow-y-auto">
         <button @click="open=false" class="mb-6 text-left">✕</button>
         <ul class="space-y-4 text-lg">
           <li><a href="#features" @click="open=false">Features</a></li>
@@ -246,7 +245,7 @@ All in one cinematic, cursed-core playground for creators with taste. <span clas
     </svg>
   </section>
   <!-- PRICING -->
-  <section id="pricing" class="relative py-28 sm:py-36 bg-[#080a1e]">
+  <section id="pricing" class="relative py-28 sm:py-36 bg-[#000000]">
     <div class="mx-auto max-w-6xl px-6">
       <h2 class="text-center text-3xl md:text-4xl font-extrabold text-white">
         Plans for <span class="text-violet-400">Solo Hustlers</span> &amp; <span class="text-violet-400">Studio Teams</span>
@@ -416,7 +415,7 @@ All in one cinematic, cursed-core playground for creators with taste. <span clas
   </section>
 
   <!-- NEWSLETTER -->
-  <section class="relative py-24 sm:py-32 bg-[#07091c]">
+  <section class="relative py-24 sm:py-32 bg-[#000000]">
     <div class="mx-auto max-w-xl px-6 text-center">
       <h2 class="text-3xl font-extrabold text-white">
         Weekly Digest, Zero Spam
@@ -442,7 +441,7 @@ All in one cinematic, cursed-core playground for creators with taste. <span clas
   </section>
 
   <!-- FOOTER -->
-  <footer class="relative border-t border-white/10 bg-[#050618] py-16">
+  <footer class="relative border-t border-white/10 bg-[#000000] py-16">
     <div class="mx-auto max-w-6xl px-6">
       <div class="grid gap-12 lg:grid-cols-5">
         <div class="lg:col-span-2">
